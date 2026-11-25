@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-11-25] - Cloudflare Workers Migration (`vinext` + Typed `cf` Config)
+### Added
+- `vite.config.ts` & `cloudflare.config.ts`: Configured `vinext` with `workersCacheCdnAdapter()`, `@cloudflare/vite-plugin`, `nodejs_compat`, `demo-website` Worker name, `accountId`, and `CMS_PROVIDER` / `CMS_ENDPOINT` text bindings for WordPress REST v2 (`wp-posts`).
+- `pnpm-workspace.yaml`: Approved `workerd` build scripts cleanly under pnpm v11 while keeping `.npmrc`/`.pnpmrc` minimal (`node-linker=hoisted`).
+### Changed
+- `package.json` & `postcss.config.cjs`: Added `"type": "module"`, `"packageManager": "pnpm@11.28.5"`, and `dev:vinext` / `build:vinext` / `start:vinext` / `deploy:vinext` scripts alongside existing `next` scripts; migrated `postcss.config.js` to `postcss.config.cjs`.
+- `lib/cms/config-loader.ts` & `next.config.js` & `tests/seo/redirects-and-metadata.test.ts`: Replaced runtime `node:fs` / `require()` reads of `data/*.json` with bundled ESM JSON imports (`with { type: "json" }`) so both Cloudflare Workers (`workerd`) and Next.js run identically.
+- `eslint.config.mjs` & `.gitignore`: Ignored Vite/Cloudflare build directories (`dist/`, `.vinext/`, `.cloudflare/`) and `*.zip` archives.
+
 ## [2026-11-25] - WordPress Posts REST v2 Adapter (`wp-posts`) & Live Site Integration
 ### Added
 - `lib/cms/adapters/wp-posts.ts` (`WpPostsCmsAdapter`, `mapWpPostToRaw`): Free WordPress REST API v2 adapter supporting WordPress.com Simple sites (`https://public-api.wordpress.com/wp/v2/sites/<domain>`) and self-hosted WordPress (`/wp-json/wp/v2`) without plugins or WooCommerce. Extracts pricing, SKU, brand, warranty, availability, featured/flash-deal flags, images (`wp:featuredmedia` + inline `<img>`), and hardware attributes from HTML tables, lists, `Key: Value` lines, `meta`, and tags with 60s TTL caching, in-flight deduplication, pagination, and 10s timeouts.

@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { createRequire } from "node:module";
+import nextConfigModule from "../../next.config.js";
 import { constructMetadata, normalizeBaseUrl } from "../../lib/seo/metadata.ts";
 
 interface RedirectRule {
@@ -27,8 +27,7 @@ interface NextConfigShape {
   headers?: () => Promise<HeaderRule[]>;
 }
 
-const require = createRequire(import.meta.url);
-const nextConfig = require("../../next.config.js") as NextConfigShape;
+const nextConfig = nextConfigModule as NextConfigShape;
 
 describe("SEO redirects, headers, and metadata verification", () => {
   it("validates data/redirects.json integrity and required redirect rules", () => {

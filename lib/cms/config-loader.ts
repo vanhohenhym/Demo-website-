@@ -1,6 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import rawBrandsJson from "../../data/brands.json" with { type: "json" };
+import rawOverridesJson from "../../data/overrides.json" with { type: "json" };
 import type {
   BrandEnrichmentConfig,
   KeyValuePair,
@@ -9,15 +8,6 @@ import type {
 
 let cachedBrands: BrandEnrichmentConfig[] | null = null;
 let cachedOverrides: SkuOverridesMap | null = null;
-
-function resolveDataFilePath(filename: string): string {
-  const fromCwd = path.resolve(process.cwd(), "data", filename);
-  if (fs.existsSync(fromCwd)) {
-    return fromCwd;
-  }
-  const currentDir = path.dirname(fileURLToPath(import.meta.url));
-  return path.resolve(currentDir, "..", "..", "data", filename);
-}
 
 function isStringArray(value: unknown): value is string[] {
   return (
@@ -53,15 +43,8 @@ export function loadBrandConfigs(forceReload = false): BrandEnrichmentConfig[] {
     return cachedBrands;
   }
 
-  const filePath = resolveDataFilePath("brands.json");
-  if (!fs.existsSync(filePath)) {
-    cachedBrands = [];
-    return cachedBrands;
-  }
-
   try {
-    const raw = fs.readFileSync(filePath, "utf8");
-    const parsed: unknown = JSON.parse(raw);
+    const parsed: unknown = rawBrandsJson;
     if (!Array.isArray(parsed)) {
       cachedBrands = [];
       return cachedBrands;
@@ -91,15 +74,8 @@ export function loadSkuOverrides(forceReload = false): SkuOverridesMap {
     return cachedOverrides;
   }
 
-  const filePath = resolveDataFilePath("overrides.json");
-  if (!fs.existsSync(filePath)) {
-    cachedOverrides = {};
-    return cachedOverrides;
-  }
-
   try {
-    const raw = fs.readFileSync(filePath, "utf8");
-    const parsed: unknown = JSON.parse(raw);
+    const parsed: unknown = rawOverridesJson;
     if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
       cachedOverrides = {};
       return cachedOverrides;
