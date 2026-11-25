@@ -1,0 +1,972 @@
+{
+  "id": "fbc4821e-dd31-4be8-a89f-382359e1acf1",
+  "label": "PC Builder Compatibility and Pricing Suite",
+  "modelType": "testSuite",
+  "description": "",
+  "testCases": [
+    {
+      "id": "6cb923c6-2680-460b-b2ca-f5a794e805b6",
+      "label": "PSU unknown when GPU selected without TDP",
+      "input": {
+        "cpu": {
+          "id": "c1",
+          "sku": "C1",
+          "tdp": {
+            "value": 120,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "name": "Ryzen 7",
+          "brand": "AMD",
+          "price": 399,
+          "brandSlug": "amd",
+          "availability": "in_stock",
+          "categorySlug": "cpu"
+        },
+        "gpu": {
+          "id": "g1",
+          "sku": "G1",
+          "name": "RTX 4070",
+          "brand": "ASUS",
+          "price": 599,
+          "brandSlug": "asus",
+          "availability": "in_stock",
+          "categorySlug": "gpu"
+        },
+        "psu": {
+          "id": "p1",
+          "sku": "P1",
+          "name": "RM750e",
+          "brand": "Corsair",
+          "price": 99,
+          "wattage": {
+            "value": 750,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "psu"
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "psu_wattage",
+            "status": "unknown",
+            "message": "GPU power draw unknown",
+            "verified": false,
+            "confidence": "low"
+          }
+        ],
+        "errorCount": 0,
+        "warningCount": 0,
+        "unverifiedCount": 1
+      }
+    },
+    {
+      "id": "52dc4df2-c453-4627-81da-f400f87b8d1b",
+      "label": "PSU exactly at estimated draw (390W) triggers warning",
+      "input": {
+        "cpu": {
+          "id": "c1",
+          "sku": "C1",
+          "tdp": {
+            "value": 100,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "name": "Ryzen 5",
+          "brand": "AMD",
+          "price": 200,
+          "brandSlug": "amd",
+          "availability": "in_stock",
+          "categorySlug": "cpu"
+        },
+        "gpu": {
+          "id": "g1",
+          "sku": "G1",
+          "tdp": {
+            "value": 200,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "name": "RTX 4070",
+          "brand": "ASUS",
+          "price": 500,
+          "brandSlug": "asus",
+          "availability": "in_stock",
+          "categorySlug": "gpu"
+        },
+        "psu": {
+          "id": "p1",
+          "sku": "P1",
+          "name": "Exact Draw PSU",
+          "brand": "Corsair",
+          "price": 60,
+          "wattage": {
+            "value": 390,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "psu"
+        },
+        "ram": {
+          "id": "r1",
+          "sku": "R1",
+          "name": "DDR5",
+          "brand": "Corsair",
+          "price": 100,
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "ram"
+        },
+        "ramQuantity": 2,
+        "storageItems": [
+          {
+            "product": {
+              "id": "s1",
+              "sku": "S1",
+              "name": "990 Pro",
+              "brand": "Samsung",
+              "price": 100,
+              "brandSlug": "samsung",
+              "availability": "in_stock",
+              "categorySlug": "storage"
+            },
+            "quantity": 1
+          }
+        ]
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "psu_wattage",
+            "status": "warning",
+            "message": "390W PSU is below recommended 507W (1.3x headroom)",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 0,
+        "warningCount": 1
+      }
+    },
+    {
+      "id": "e6ab8db0-e997-45ec-a572-9c7916e1f46e",
+      "label": "PSU exactly at recommended wattage (507W) passes",
+      "input": {
+        "cpu": {
+          "id": "c1",
+          "sku": "C1",
+          "tdp": {
+            "value": 100,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "name": "Ryzen 5",
+          "brand": "AMD",
+          "price": 200,
+          "brandSlug": "amd",
+          "availability": "in_stock",
+          "categorySlug": "cpu"
+        },
+        "gpu": {
+          "id": "g1",
+          "sku": "G1",
+          "tdp": {
+            "value": 200,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "name": "RTX 4070",
+          "brand": "ASUS",
+          "price": 500,
+          "brandSlug": "asus",
+          "availability": "in_stock",
+          "categorySlug": "gpu"
+        },
+        "psu": {
+          "id": "p1",
+          "sku": "P1",
+          "name": "Exact Recommended PSU",
+          "brand": "Corsair",
+          "price": 80,
+          "wattage": {
+            "value": 507,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "psu"
+        },
+        "ram": {
+          "id": "r1",
+          "sku": "R1",
+          "name": "DDR5",
+          "brand": "Corsair",
+          "price": 100,
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "ram"
+        },
+        "ramQuantity": 2,
+        "storageItems": [
+          {
+            "product": {
+              "id": "s1",
+              "sku": "S1",
+              "name": "990 Pro",
+              "brand": "Samsung",
+              "price": 100,
+              "brandSlug": "samsung",
+              "availability": "in_stock",
+              "categorySlug": "storage"
+            },
+            "quantity": 1
+          }
+        ]
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "psu_wattage",
+            "status": "ok",
+            "message": "507W PSU meets recommended 507W",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 0,
+        "warningCount": 0
+      }
+    },
+    {
+      "id": "9b9b400e-c7da-4afe-9ff5-c26025ce7f72",
+      "label": "GPU clearance exactly 0mm triggers warning",
+      "input": {
+        "gpu": {
+          "id": "g1",
+          "sku": "G1",
+          "name": "GPU 320mm",
+          "brand": "ASUS",
+          "price": 500,
+          "lengthMm": {
+            "value": 320,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "asus",
+          "availability": "in_stock",
+          "categorySlug": "gpu"
+        },
+        "pcCase": {
+          "id": "case1",
+          "sku": "CASE1",
+          "name": "Case 320mm",
+          "brand": "Corsair",
+          "price": 100,
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "case",
+          "maxGpuLengthMm": {
+            "value": 320,
+            "source": "explicit",
+            "confidence": "high"
+          }
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "gpu_case_length",
+            "status": "warning",
+            "message": "Tight GPU clearance: 0mm remaining",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 0,
+        "warningCount": 1
+      }
+    },
+    {
+      "id": "5a551254-8b08-4663-8283-4b4ff8136267",
+      "label": "GPU clearance exactly 10mm triggers warning",
+      "input": {
+        "gpu": {
+          "id": "g1",
+          "sku": "G1",
+          "name": "GPU 310mm",
+          "brand": "ASUS",
+          "price": 500,
+          "lengthMm": {
+            "value": 310,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "asus",
+          "availability": "in_stock",
+          "categorySlug": "gpu"
+        },
+        "pcCase": {
+          "id": "case1",
+          "sku": "CASE1",
+          "name": "Case 320mm",
+          "brand": "Corsair",
+          "price": 100,
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "case",
+          "maxGpuLengthMm": {
+            "value": 320,
+            "source": "explicit",
+            "confidence": "high"
+          }
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "gpu_case_length",
+            "status": "warning",
+            "message": "Tight GPU clearance: 10mm remaining",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 0,
+        "warningCount": 1
+      }
+    },
+    {
+      "id": "e73f80b1-2335-4895-8af2-57ae770cb399",
+      "label": "Unsupported storage interface returns error",
+      "input": {
+        "motherboard": {
+          "id": "m1",
+          "sku": "M1",
+          "name": "B650",
+          "brand": "MSI",
+          "price": 200,
+          "brandSlug": "msi",
+          "availability": "in_stock",
+          "categorySlug": "motherboard",
+          "storageInterfaces": {
+            "value": [
+              "M.2 NVMe",
+              "SATA III"
+            ],
+            "source": "explicit",
+            "confidence": "high"
+          }
+        },
+        "storageItems": [
+          {
+            "product": {
+              "id": "s1",
+              "sku": "S1",
+              "name": "U.2 SSD",
+              "brand": "Intel",
+              "price": 250,
+              "brandSlug": "intel",
+              "availability": "in_stock",
+              "categorySlug": "storage",
+              "storageInterface": {
+                "value": "U.2",
+                "source": "explicit",
+                "confidence": "high"
+              }
+            },
+            "quantity": 1
+          }
+        ]
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "storage_interface",
+            "status": "error",
+            "message": "Storage interface U.2 is not supported by motherboard",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 1,
+        "warningCount": 0
+      }
+    },
+    {
+      "id": "0d40516d-6eae-4d83-859f-4a27e003e14b",
+      "label": "Per-attribute parsed check isolates detected-data notice to socket rule",
+      "input": {
+        "cpu": {
+          "id": "c1",
+          "sku": "C1",
+          "tdp": {
+            "value": 65,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "name": "Ryzen 5",
+          "brand": "AMD",
+          "price": 200,
+          "socket": {
+            "value": "AM5",
+            "source": "parsed",
+            "confidence": "medium"
+          },
+          "brandSlug": "amd",
+          "availability": "in_stock",
+          "categorySlug": "cpu"
+        },
+        "psu": {
+          "id": "p1",
+          "sku": "P1",
+          "name": "RM650",
+          "brand": "Corsair",
+          "price": 90,
+          "wattage": {
+            "value": 650,
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "psu"
+        },
+        "motherboard": {
+          "id": "m1",
+          "sku": "M1",
+          "name": "B650",
+          "brand": "MSI",
+          "price": 200,
+          "socket": {
+            "value": "AM5",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "msi",
+          "availability": "in_stock",
+          "categorySlug": "motherboard"
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "cpu_mobo_socket",
+            "status": "ok",
+            "message": "CPU and motherboard both use socket AM5 (based on detected data)",
+            "verified": false,
+            "confidence": "medium"
+          },
+          {
+            "ruleId": "psu_wattage",
+            "status": "ok",
+            "message": "650W PSU meets recommended 182W",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 0,
+        "warningCount": 0
+      }
+    },
+    {
+      "id": "28e449d5-d380-49c8-a505-fba20c0a7db9",
+      "label": "Empty coolerSockets unknown with verified rule and salePrice > price ignored",
+      "input": {
+        "cpu": {
+          "id": "c1",
+          "sku": "C1",
+          "name": "Ryzen 5",
+          "brand": "AMD",
+          "price": 200,
+          "socket": {
+            "value": "AM5",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "amd",
+          "availability": "in_stock",
+          "categorySlug": "cpu"
+        },
+        "cooler": {
+          "id": "cl1",
+          "sku": "CL1",
+          "name": "NH-D15",
+          "brand": "Noctua",
+          "price": 100,
+          "brandSlug": "noctua",
+          "salePrice": 120,
+          "availability": "in_stock",
+          "categorySlug": "cooler",
+          "coolerSockets": {
+            "value": [],
+            "source": "explicit",
+            "confidence": "high"
+          }
+        },
+        "extras": [
+          {
+            "product": {
+              "id": "ex1",
+              "sku": "EX1",
+              "name": "27in Monitor",
+              "brand": "Dell",
+              "price": 200,
+              "brandSlug": "dell",
+              "salePrice": 150,
+              "availability": "in_stock",
+              "categorySlug": "monitor"
+            },
+            "quantity": 1
+          }
+        ],
+        "verifiedRules": [
+          "cooler_cpu_socket"
+        ]
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "cooler_cpu_socket",
+            "status": "unknown",
+            "message": "Missing cooler supported sockets or CPU socket data",
+            "verified": true,
+            "confidence": "low"
+          }
+        ],
+        "itemCount": 3,
+        "errorCount": 0,
+        "totalPrice": 450,
+        "unverifiedCount": 0
+      }
+    },
+    {
+      "id": "f94599bc-bd02-4e98-b0da-e7f902056e1d",
+      "label": "Socket mismatch returns error",
+      "input": {
+        "cpu": {
+          "id": "c1",
+          "sku": "C1",
+          "name": "Ryzen 5",
+          "brand": "AMD",
+          "price": 200,
+          "socket": {
+            "value": "AM5",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "amd",
+          "availability": "in_stock",
+          "categorySlug": "cpu"
+        },
+        "motherboard": {
+          "id": "m1",
+          "sku": "M1",
+          "name": "Z790",
+          "brand": "ASUS",
+          "price": 250,
+          "socket": {
+            "value": "LGA1700",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "asus",
+          "availability": "in_stock",
+          "categorySlug": "motherboard"
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "cpu_mobo_socket",
+            "status": "error",
+            "message": "CPU socket AM5 does not match motherboard socket LGA1700",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 1,
+        "warningCount": 0
+      }
+    },
+    {
+      "id": "3db342d5-0ab1-4da7-8995-389e1958fcd9",
+      "label": "RAM type mismatch returns error",
+      "input": {
+        "ram": {
+          "id": "r1",
+          "sku": "R1",
+          "name": "Vengeance DDR4",
+          "brand": "Corsair",
+          "price": 60,
+          "ramType": {
+            "value": "DDR4",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "corsair",
+          "availability": "in_stock",
+          "categorySlug": "ram"
+        },
+        "motherboard": {
+          "id": "m1",
+          "sku": "M1",
+          "name": "B650",
+          "brand": "MSI",
+          "price": 200,
+          "ramType": {
+            "value": "DDR5",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "msi",
+          "availability": "in_stock",
+          "categorySlug": "motherboard"
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "ram_mobo_type",
+            "status": "error",
+            "message": "DDR4 memory is incompatible with DDR5 motherboard",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 1,
+        "warningCount": 0
+      }
+    },
+    {
+      "id": "576b6953-91c7-4d5c-a324-52b91d395413",
+      "label": "Form factor fits (mATX in ATX case) passes",
+      "input": {
+        "pcCase": {
+          "id": "case1",
+          "sku": "CASE1",
+          "name": "4000D",
+          "brand": "Corsair",
+          "price": 100,
+          "brandSlug": "corsair",
+          "formFactor": {
+            "value": "ATX",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "availability": "in_stock",
+          "categorySlug": "case"
+        },
+        "motherboard": {
+          "id": "m1",
+          "sku": "M1",
+          "name": "B650M",
+          "brand": "MSI",
+          "price": 150,
+          "brandSlug": "msi",
+          "formFactor": {
+            "value": "mATX",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "availability": "in_stock",
+          "categorySlug": "motherboard"
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "mobo_case_formfactor",
+            "status": "ok",
+            "message": "mATX motherboard fits ATX case",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 0,
+        "warningCount": 0
+      }
+    },
+    {
+      "id": "be732cde-c2bf-4d64-b7d1-9235244bc99b",
+      "label": "Form factor does not fit (ATX in mATX case) returns error",
+      "input": {
+        "pcCase": {
+          "id": "case1",
+          "sku": "CASE1",
+          "name": "Pop Mini",
+          "brand": "Fractal",
+          "price": 90,
+          "brandSlug": "fractal",
+          "formFactor": {
+            "value": "mATX",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "availability": "in_stock",
+          "categorySlug": "case"
+        },
+        "motherboard": {
+          "id": "m1",
+          "sku": "M1",
+          "name": "B650 Tomahawk",
+          "brand": "MSI",
+          "price": 200,
+          "brandSlug": "msi",
+          "formFactor": {
+            "value": "ATX",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "availability": "in_stock",
+          "categorySlug": "motherboard"
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "mobo_case_formfactor",
+            "status": "error",
+            "message": "ATX motherboard does not fit mATX case",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 1,
+        "warningCount": 0
+      }
+    },
+    {
+      "id": "950059a2-1ad0-4efb-ba27-44092c6b90d1",
+      "label": "Cooler socket mismatch returns error",
+      "input": {
+        "cpu": {
+          "id": "c1",
+          "sku": "C1",
+          "name": "Ryzen 5",
+          "brand": "AMD",
+          "price": 200,
+          "socket": {
+            "value": "AM5",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "amd",
+          "availability": "in_stock",
+          "categorySlug": "cpu"
+        },
+        "cooler": {
+          "id": "cl1",
+          "sku": "CL1",
+          "name": "Old Cooler",
+          "brand": "Noctua",
+          "price": 70,
+          "brandSlug": "noctua",
+          "availability": "in_stock",
+          "categorySlug": "cooler",
+          "coolerSockets": {
+            "value": [
+              "LGA1700",
+              "LGA1200"
+            ],
+            "source": "explicit",
+            "confidence": "high"
+          }
+        }
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "cooler_cpu_socket",
+            "status": "error",
+            "message": "Cooler does not list support for AM5",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 1,
+        "warningCount": 0
+      }
+    },
+    {
+      "id": "8ca4cec0-afc9-412b-973e-9b7f14b4764a",
+      "label": "ramQuantity pricing multiplies effective price by quantity",
+      "input": {
+        "ram": {
+          "id": "r1",
+          "sku": "R1",
+          "name": "DDR5 16GB",
+          "brand": "Corsair",
+          "price": 100,
+          "brandSlug": "corsair",
+          "salePrice": 85,
+          "availability": "in_stock",
+          "categorySlug": "ram"
+        },
+        "ramQuantity": 3
+      },
+      "expectedOutput": {
+        "itemCount": 3,
+        "totalPrice": 255
+      }
+    },
+    {
+      "id": "1915d162-2e7f-4936-ba45-792cde7fc044",
+      "label": "Extras with quantity pricing sums subtotals and itemCount",
+      "input": {
+        "extras": [
+          {
+            "product": {
+              "id": "ex1",
+              "sku": "EX1",
+              "name": "24in Monitor",
+              "brand": "Dell",
+              "price": 150,
+              "brandSlug": "dell",
+              "availability": "in_stock",
+              "categorySlug": "monitor"
+            },
+            "quantity": 2
+          },
+          {
+            "product": {
+              "id": "ex2",
+              "sku": "EX2",
+              "name": "Mechanical Keyboard",
+              "brand": "Logitech",
+              "price": 50,
+              "brandSlug": "logitech",
+              "availability": "in_stock",
+              "categorySlug": "keyboard"
+            },
+            "quantity": 3
+          }
+        ]
+      },
+      "expectedOutput": {
+        "itemCount": 5,
+        "totalPrice": 450
+      }
+    },
+    {
+      "id": "a9487fba-8826-4187-a64d-061525994514",
+      "label": "ignoreCompatibility true skips all compatibility checks",
+      "input": {
+        "cpu": {
+          "id": "c1",
+          "sku": "C1",
+          "name": "Ryzen 5",
+          "brand": "AMD",
+          "price": 200,
+          "socket": {
+            "value": "AM5",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "amd",
+          "availability": "in_stock",
+          "categorySlug": "cpu"
+        },
+        "motherboard": {
+          "id": "m1",
+          "sku": "M1",
+          "name": "Z790",
+          "brand": "ASUS",
+          "price": 250,
+          "socket": {
+            "value": "LGA1700",
+            "source": "explicit",
+            "confidence": "high"
+          },
+          "brandSlug": "asus",
+          "availability": "in_stock",
+          "categorySlug": "motherboard"
+        },
+        "ignoreCompatibility": true
+      },
+      "expectedOutput": {
+        "checks": [],
+        "errorCount": 0,
+        "warningCount": 0,
+        "unverifiedCount": 0
+      }
+    },
+    {
+      "id": "dc01945b-611a-4062-82a6-29e56b9f4d75",
+      "label": "Two drives with one missing data and one unsupported prioritizes error over unknown",
+      "input": {
+        "motherboard": {
+          "id": "m1",
+          "sku": "M1",
+          "name": "B650",
+          "brand": "MSI",
+          "price": 200,
+          "brandSlug": "msi",
+          "availability": "in_stock",
+          "categorySlug": "motherboard",
+          "storageInterfaces": {
+            "value": [
+              "M.2 NVMe",
+              "SATA III"
+            ],
+            "source": "explicit",
+            "confidence": "high"
+          }
+        },
+        "storageItems": [
+          {
+            "product": {
+              "id": "s1",
+              "sku": "S1",
+              "name": "Unknown Drive",
+              "brand": "Crucial",
+              "price": 80,
+              "brandSlug": "crucial",
+              "availability": "in_stock",
+              "categorySlug": "storage"
+            },
+            "quantity": 1
+          },
+          {
+            "product": {
+              "id": "s2",
+              "sku": "S2",
+              "name": "U.2 Drive",
+              "brand": "Intel",
+              "price": 250,
+              "brandSlug": "intel",
+              "availability": "in_stock",
+              "categorySlug": "storage",
+              "storageInterface": {
+                "value": "U.2",
+                "source": "explicit",
+                "confidence": "high"
+              }
+            },
+            "quantity": 1
+          }
+        ]
+      },
+      "expectedOutput": {
+        "checks": [
+          {
+            "ruleId": "storage_interface",
+            "status": "error",
+            "message": "Storage interface U.2 is not supported by motherboard",
+            "verified": false,
+            "confidence": "high"
+          }
+        ],
+        "errorCount": 1,
+        "warningCount": 0,
+        "unverifiedCount": 0
+      }
+    }
+  ]
+}

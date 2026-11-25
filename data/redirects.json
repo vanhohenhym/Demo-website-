@@ -1,0 +1,62 @@
+[
+  {
+    "source": "/old-category/laptops",
+    "destination": "/category/laptop",
+    "permanent": true
+  },
+  {
+    "source": "/build-pc",
+    "destination": "/pc-builder",
+    "permanent": true
+  },
+  {
+    "source": "/cpus",
+    "destination": "/category/processor",
+    "permanent": true
+  },
+  {
+    "source": "/gpus",
+    "destination": "/category/graphics-card",
+    "permanent": true
+  },
+  {
+    "source": "/motherboards",
+    "destination": "/category/motherboard",
+    "permanent": true
+  },
+  {
+    "source": "/contact-us",
+    "destination": "/contact",
+    "permanent": true
+  },
+  {
+    "source": "/privacy",
+    "destination": "/privacy-policy",
+    "permanent": true
+  },
+  {
+    "source": "/terms-and-conditions",
+    "destination": "/terms",
+    "permanent": true
+  },
+  {
+    "source": "/offers",
+    "destination": "/category/component",
+    "permanent": true
+  },
+  {
+    "source": "/deals",
+    "destination": "/category/component",
+    "permanent": true
+  },
+  {
+    "source": "/account",
+    "destination": "/contact",
+    "permanent": true
+  },
+  {
+    "source": "/cart",
+    "destination": "/pc-builder",
+    "permanent": true
+  }
+]

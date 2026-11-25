@@ -1,0 +1,102 @@
+{
+  "id": "1fae5f87-212a-4a80-b25d-b88bbff000a2",
+  "label": "Catalog Data Health Suite",
+  "modelType": "testSuite",
+  "description": "",
+  "testCases": [
+    {
+      "id": "226c0b0e-af23-47de-b58d-e760d4bdbafe",
+      "label": "Storage category green with parsed attribute and empty categories no-data",
+      "input": {
+        "products": [
+          {
+            "id": "s1",
+            "sku": "S1",
+            "name": "NVMe 1TB",
+            "brand": "Other",
+            "price": 80,
+            "brandSlug": "other",
+            "availability": "in_stock",
+            "categorySlug": "storage",
+            "storageInterface": {
+              "value": "M.2 NVMe",
+              "source": "parsed",
+              "confidence": "medium"
+            }
+          }
+        ]
+      },
+      "expectedOutput": {
+        "overallStatus": "green",
+        "otherBrandCount": 1,
+        "parsedProductCount": 1
+      }
+    },
+    {
+      "id": "a269522c-0c86-48bc-9a7c-c0513567b742",
+      "label": "Empty coolerSockets treated as absent yielding red health status",
+      "input": {
+        "products": [
+          {
+            "id": "cl1",
+            "sku": "CL1",
+            "name": "NH-D15",
+            "brand": "Noctua",
+            "price": 100,
+            "brandSlug": "noctua",
+            "availability": "in_stock",
+            "categorySlug": "cooler",
+            "coolerSockets": {
+              "value": [],
+              "source": "explicit",
+              "confidence": "high"
+            }
+          }
+        ]
+      },
+      "expectedOutput": {
+        "overallStatus": "red",
+        "otherBrandCount": 0,
+        "parsedProductCount": 0
+      }
+    },
+    {
+      "id": "28427951-28a2-4acb-a534-7c482dd226b4",
+      "label": "Motherboard missing storageInterfaces yields 75% amber health status",
+      "input": {
+        "products": [
+          {
+            "id": "m1",
+            "sku": "M1",
+            "name": "B650 Tomahawk",
+            "brand": "MSI",
+            "price": 200,
+            "socket": {
+              "value": "AM5",
+              "source": "explicit",
+              "confidence": "high"
+            },
+            "ramType": {
+              "value": "DDR5",
+              "source": "explicit",
+              "confidence": "high"
+            },
+            "brandSlug": "msi",
+            "formFactor": {
+              "value": "ATX",
+              "source": "explicit",
+              "confidence": "high"
+            },
+            "availability": "in_stock",
+            "categorySlug": "motherboard"
+          }
+        ]
+      },
+      "expectedOutput": {
+        "overallStatus": "amber",
+        "otherBrandCount": 0,
+        "parsedProductCount": 0
+      }
+    }
+  ]
+}

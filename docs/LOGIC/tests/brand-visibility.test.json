@@ -1,0 +1,456 @@
+{
+  "id": "94c698cf-a5f0-4749-bdc0-8edf32876d68",
+  "label": "Brand Visibility Messy Data Suite",
+  "modelType": "testSuite",
+  "description": "",
+  "testCases": [
+    {
+      "id": "e89ce518-426c-4100-9956-f067c0d8c6df",
+      "label": "Other placed last and brands below 3 marked non-indexable",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "Board 1",
+            "brand": "Other",
+            "brandSlug": "other",
+            "availability": "in_stock",
+            "categorySlug": "motherboard"
+          },
+          {
+            "id": "2",
+            "sku": "2",
+            "name": "Board 2",
+            "brand": "MSI",
+            "brandSlug": "msi",
+            "availability": "in_stock",
+            "categorySlug": "motherboard"
+          },
+          {
+            "id": "3",
+            "sku": "3",
+            "name": "Board 3",
+            "brand": "ASUS",
+            "brandSlug": "asus",
+            "availability": "in_stock",
+            "categorySlug": "motherboard"
+          },
+          {
+            "id": "4",
+            "sku": "4",
+            "name": "Board 4",
+            "brand": "ASUS",
+            "brandSlug": "asus",
+            "availability": "in_stock",
+            "categorySlug": "motherboard"
+          },
+          {
+            "id": "5",
+            "sku": "5",
+            "name": "Board 5",
+            "brand": "ASUS",
+            "brandSlug": "asus",
+            "availability": "in_stock",
+            "categorySlug": "motherboard"
+          }
+        ],
+        "categorySlug": "motherboard",
+        "indexMinProducts": 3,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "ASUS",
+            "count": 3,
+            "brandSlug": "asus",
+            "indexable": true
+          },
+          {
+            "brand": "MSI",
+            "count": 1,
+            "brandSlug": "msi",
+            "indexable": false
+          },
+          {
+            "brand": "Other",
+            "count": 1,
+            "brandSlug": "other",
+            "indexable": false
+          }
+        ],
+        "categoryIndexable": true,
+        "totalCategoryProducts": 5
+      }
+    },
+    {
+      "id": "bdd7e054-6aed-4f8e-b99b-f936e9cb8afa",
+      "label": "Other omitted when zero Other-brand products exist in category",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "RTX 4070",
+            "brand": "ASUS",
+            "brandSlug": "asus",
+            "availability": "in_stock",
+            "categorySlug": "gpu"
+          }
+        ],
+        "categorySlug": "gpu",
+        "indexMinProducts": 3,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "ASUS",
+            "count": 1,
+            "brandSlug": "asus",
+            "indexable": false
+          }
+        ],
+        "categoryIndexable": false,
+        "totalCategoryProducts": 1
+      }
+    },
+    {
+      "id": "93ada14b-e010-4d67-8769-59b67bfeba99",
+      "label": "Empty category returns empty brands list and categoryIndexable false",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "RTX 4070",
+            "brand": "ASUS",
+            "brandSlug": "asus",
+            "availability": "in_stock",
+            "categorySlug": "gpu"
+          }
+        ],
+        "categorySlug": "tablet",
+        "indexMinProducts": 3,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [],
+        "categoryIndexable": false,
+        "totalCategoryProducts": 0
+      }
+    },
+    {
+      "id": "6c454401-38ef-48a6-8af3-534b83aa73e9",
+      "label": "minBrandProducts 2 hides brands with only 1 product including Other",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "CPU 1",
+            "brand": "ASUS",
+            "brandSlug": "asus",
+            "availability": "in_stock",
+            "categorySlug": "cpu"
+          },
+          {
+            "id": "2",
+            "sku": "2",
+            "name": "CPU 2",
+            "brand": "ASUS",
+            "brandSlug": "asus",
+            "availability": "in_stock",
+            "categorySlug": "cpu"
+          },
+          {
+            "id": "3",
+            "sku": "3",
+            "name": "CPU 3",
+            "brand": "Other",
+            "brandSlug": "other",
+            "availability": "in_stock",
+            "categorySlug": "cpu"
+          }
+        ],
+        "categorySlug": "cpu",
+        "indexMinProducts": 3,
+        "minBrandProducts": 2
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "ASUS",
+            "count": 2,
+            "brandSlug": "asus",
+            "indexable": false
+          }
+        ],
+        "categoryIndexable": true,
+        "totalCategoryProducts": 3
+      }
+    },
+    {
+      "id": "554a9752-01e1-43a6-b7ef-2f7560d37ec4",
+      "label": "Exact indexMinProducts boundary (3) sets indexable true",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "PSU 1",
+            "brand": "Corsair",
+            "brandSlug": "corsair",
+            "availability": "in_stock",
+            "categorySlug": "psu"
+          },
+          {
+            "id": "2",
+            "sku": "2",
+            "name": "PSU 2",
+            "brand": "Corsair",
+            "brandSlug": "corsair",
+            "availability": "in_stock",
+            "categorySlug": "psu"
+          },
+          {
+            "id": "3",
+            "sku": "3",
+            "name": "PSU 3",
+            "brand": "Corsair",
+            "brandSlug": "corsair",
+            "availability": "in_stock",
+            "categorySlug": "psu"
+          }
+        ],
+        "categorySlug": "psu",
+        "indexMinProducts": 3,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "Corsair",
+            "count": 3,
+            "brandSlug": "corsair",
+            "indexable": true
+          }
+        ],
+        "categoryIndexable": true,
+        "totalCategoryProducts": 3
+      }
+    },
+    {
+      "id": "b2f623a3-28ff-4c32-ba20-4c8338d2f6b8",
+      "label": "Count 2 below indexMinProducts (3) sets both brand and category indexable false",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "PSU 1",
+            "brand": "Corsair",
+            "brandSlug": "corsair",
+            "availability": "in_stock",
+            "categorySlug": "psu"
+          },
+          {
+            "id": "2",
+            "sku": "2",
+            "name": "PSU 2",
+            "brand": "Corsair",
+            "brandSlug": "corsair",
+            "availability": "in_stock",
+            "categorySlug": "psu"
+          }
+        ],
+        "categorySlug": "psu",
+        "indexMinProducts": 3,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "Corsair",
+            "count": 2,
+            "brandSlug": "corsair",
+            "indexable": false
+          }
+        ],
+        "categoryIndexable": false,
+        "totalCategoryProducts": 2
+      }
+    },
+    {
+      "id": "c433f5d3-76d6-4a22-8d52-f95fae6b8447",
+      "label": "Category with only Other brand shows Other with indexable always false",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "Cable 1",
+            "brand": "Other",
+            "brandSlug": "other",
+            "availability": "in_stock",
+            "categorySlug": "accessories"
+          },
+          {
+            "id": "2",
+            "sku": "2",
+            "name": "Cable 2",
+            "brand": "Other",
+            "brandSlug": "other",
+            "availability": "in_stock",
+            "categorySlug": "accessories"
+          },
+          {
+            "id": "3",
+            "sku": "3",
+            "name": "Cable 3",
+            "brand": "Other",
+            "brandSlug": "other",
+            "availability": "in_stock",
+            "categorySlug": "accessories"
+          }
+        ],
+        "categorySlug": "accessories",
+        "indexMinProducts": 3,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "Other",
+            "count": 3,
+            "brandSlug": "other",
+            "indexable": false
+          }
+        ],
+        "categoryIndexable": true,
+        "totalCategoryProducts": 3
+      }
+    },
+    {
+      "id": "890830e6-a97a-4c35-9a5f-22a7b9b4bd32",
+      "label": "Named brands sorted alphabetically before Other",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "i5",
+            "brand": "Intel",
+            "brandSlug": "intel",
+            "availability": "in_stock",
+            "categorySlug": "cpu"
+          },
+          {
+            "id": "2",
+            "sku": "2",
+            "name": "Ryzen 5",
+            "brand": "AMD",
+            "brandSlug": "amd",
+            "availability": "in_stock",
+            "categorySlug": "cpu"
+          }
+        ],
+        "categorySlug": "cpu",
+        "indexMinProducts": 3,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "AMD",
+            "count": 1,
+            "brandSlug": "amd",
+            "indexable": false
+          },
+          {
+            "brand": "Intel",
+            "count": 1,
+            "brandSlug": "intel",
+            "indexable": false
+          }
+        ],
+        "categoryIndexable": false,
+        "totalCategoryProducts": 2
+      }
+    },
+    {
+      "id": "0752148d-b813-44ea-b90a-80b50d45e4af",
+      "label": "Custom indexMinProducts 1 marks single-product brand indexable",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "U2723QE",
+            "brand": "Dell",
+            "brandSlug": "dell",
+            "availability": "in_stock",
+            "categorySlug": "monitor"
+          }
+        ],
+        "categorySlug": "monitor",
+        "indexMinProducts": 1,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "Dell",
+            "count": 1,
+            "brandSlug": "dell",
+            "indexable": true
+          }
+        ],
+        "categoryIndexable": true,
+        "totalCategoryProducts": 1
+      }
+    },
+    {
+      "id": "4a2d4e36-b2c9-401a-b57f-99579a9c768c",
+      "label": "Products from other categories ignored in counts and visibility",
+      "input": {
+        "products": [
+          {
+            "id": "1",
+            "sku": "1",
+            "name": "990 Pro",
+            "brand": "Samsung",
+            "brandSlug": "samsung",
+            "availability": "out_of_stock",
+            "categorySlug": "storage"
+          },
+          {
+            "id": "2",
+            "sku": "2",
+            "name": "B650",
+            "brand": "MSI",
+            "brandSlug": "msi",
+            "availability": "in_stock",
+            "categorySlug": "motherboard"
+          }
+        ],
+        "categorySlug": "storage",
+        "indexMinProducts": 3,
+        "minBrandProducts": 1
+      },
+      "expectedOutput": {
+        "brands": [
+          {
+            "brand": "Samsung",
+            "count": 1,
+            "brandSlug": "samsung",
+            "indexable": false
+          }
+        ],
+        "categoryIndexable": false,
+        "totalCategoryProducts": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,369 @@
+{
+  "id": "137b7ea6-7547-48a3-9a94-5b36e7d0f7b4",
+  "label": "Resolve Brand Messy Data Suite",
+  "modelType": "testSuite",
+  "description": "",
+  "testCases": [
+    {
+      "id": "a8ff1008-1993-423a-b906-bdd25f11e3f0",
+      "label": "Taxonomy brand wins and merges ASUSTeK alias to ASUS",
+      "input": {
+        "product": {
+          "id": "b1",
+          "sku": "S1",
+          "title": "MSI B650 Motherboard",
+          "categorySlug": "motherboard",
+          "brandTaxonomy": "ASUSTeK"
+        },
+        "brandList": [
+          {
+            "name": "ASUS",
+            "slug": "asus",
+            "aliases": [
+              "Asus",
+              "ASUSTeK"
+            ],
+            "skuPrefixes": [
+              "ASU-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "ASUS",
+        "brandSlug": "asus"
+      }
+    },
+    {
+      "id": "fd9b9aa9-0aea-4d5e-90b2-e70949b82148",
+      "label": "Lowercase Brand attribute merges trimmed asus alias to ASUS",
+      "input": {
+        "product": {
+          "id": "b2",
+          "sku": "S2",
+          "title": "Gaming RTX 4070",
+          "categorySlug": "gpu",
+          "explicitAttributes": [
+            {
+              "key": "brand",
+              "value": "  asus  "
+            }
+          ]
+        },
+        "brandList": [
+          {
+            "name": "ASUS",
+            "slug": "asus",
+            "aliases": [
+              "Asus",
+              "ASUSTeK"
+            ],
+            "skuPrefixes": [
+              "ASU-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "ASUS",
+        "brandSlug": "asus"
+      }
+    },
+    {
+      "id": "7583c578-8c02-4def-95a2-bbacaef85439",
+      "label": "Title prefix matches Corsair case-insensitively",
+      "input": {
+        "product": {
+          "id": "b3",
+          "sku": "S3",
+          "title": "CORSAIR Vengeance 32GB DDR5",
+          "categorySlug": "ram"
+        },
+        "brandList": [
+          {
+            "name": "Corsair",
+            "slug": "corsair",
+            "aliases": [
+              "CORSAIR MEMORY"
+            ],
+            "skuPrefixes": [
+              "COR-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "Corsair",
+        "brandSlug": "corsair"
+      }
+    },
+    {
+      "id": "1900bceb-a338-4536-ac50-b8e7e8999703",
+      "label": "Longest title prefix match picks HPE instead of HP",
+      "input": {
+        "product": {
+          "id": "b4",
+          "sku": "S4",
+          "title": "HPE ProLiant DL380 Gen11",
+          "categorySlug": "server-storage"
+        },
+        "brandList": [
+          {
+            "name": "HP",
+            "slug": "hp",
+            "aliases": [],
+            "skuPrefixes": [
+              "HP-"
+            ]
+          },
+          {
+            "name": "HPE",
+            "slug": "hpe",
+            "aliases": [
+              "Hewlett Packard Enterprise"
+            ],
+            "skuPrefixes": [
+              "HPE-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "HPE",
+        "brandSlug": "hpe"
+      }
+    },
+    {
+      "id": "c355dc52-df34-403e-93d2-2166ed72575c",
+      "label": "Brand name in middle of title does not match prefix and falls back to Other",
+      "input": {
+        "product": {
+          "id": "b5",
+          "sku": "DESK-1",
+          "title": "Custom Gaming PC with ASUS Motherboard",
+          "categorySlug": "desktop"
+        },
+        "brandList": [
+          {
+            "name": "ASUS",
+            "slug": "asus",
+            "aliases": [],
+            "skuPrefixes": [
+              "ASU-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "Other",
+        "brandSlug": "other"
+      }
+    },
+    {
+      "id": "51213ee9-dc50-4715-9a0f-625dd9eb656d",
+      "label": "SKU prefix match resolves Dell case-insensitively",
+      "input": {
+        "product": {
+          "id": "b6",
+          "sku": "del-u2723qe",
+          "title": "27-inch 4K IPS Monitor",
+          "categorySlug": "monitor"
+        },
+        "brandList": [
+          {
+            "name": "Dell",
+            "slug": "dell",
+            "aliases": [
+              "Dell Technologies"
+            ],
+            "skuPrefixes": [
+              "DEL-",
+              "DELL-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "Dell",
+        "brandSlug": "dell"
+      }
+    },
+    {
+      "id": "3576b747-e6a5-404a-af52-b3a526eb769f",
+      "label": "Blank taxonomy and Brand attribute fall through to Other",
+      "input": {
+        "product": {
+          "id": "b7",
+          "sku": "MISC-100",
+          "title": "Braided USB-C Cable 2m",
+          "categorySlug": "accessories",
+          "brandTaxonomy": "   ",
+          "explicitAttributes": [
+            {
+              "key": "Brand",
+              "value": ""
+            }
+          ]
+        },
+        "brandList": [
+          {
+            "name": "ASUS",
+            "slug": "asus",
+            "aliases": [],
+            "skuPrefixes": [
+              "ASU-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "Other",
+        "brandSlug": "other"
+      }
+    },
+    {
+      "id": "9782b459-7c82-4f85-bae3-42b928a55e56",
+      "label": "Unknown brand not in brandList keeps name and generates slug",
+      "input": {
+        "product": {
+          "id": "b8",
+          "sku": "FD-1",
+          "title": "North Charcoal Black",
+          "categorySlug": "case",
+          "brandTaxonomy": "Fractal Design"
+        },
+        "brandList": []
+      },
+      "expectedOutput": {
+        "brand": "Fractal Design",
+        "brandSlug": "fractal-design"
+      }
+    },
+    {
+      "id": "080d48f5-03c6-48f2-9801-99ba240efb4d",
+      "label": "Hyphenated word boundary after alias matches ASRock Rack",
+      "input": {
+        "product": {
+          "id": "b9",
+          "sku": "S9",
+          "title": "ASRock Rack-EPYCD8 Server Board",
+          "categorySlug": "motherboard"
+        },
+        "brandList": [
+          {
+            "name": "ASRock",
+            "slug": "asrock",
+            "aliases": [
+              "ASRock Rack"
+            ],
+            "skuPrefixes": [
+              "ASR-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "ASRock",
+        "brandSlug": "asrock"
+      }
+    },
+    {
+      "id": "930b0b74-40e8-4723-98de-3761d041d876",
+      "label": "Prefix without word boundary (HPX) does not falsely match HP",
+      "input": {
+        "product": {
+          "id": "b10",
+          "sku": "X10",
+          "title": "HPX Pro Workstation",
+          "categorySlug": "laptop"
+        },
+        "brandList": [
+          {
+            "name": "HP",
+            "slug": "hp",
+            "aliases": [],
+            "skuPrefixes": [
+              "HP-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "Other",
+        "brandSlug": "other"
+      }
+    },
+    {
+      "id": "0376eac8-c43f-403f-9e83-e7d6a3c7477f",
+      "label": "Placeholder taxonomy Generic and attribute OEM fall through to customFields Brand",
+      "input": {
+        "product": {
+          "id": "b11",
+          "sku": "S11",
+          "title": "B650 Board",
+          "categorySlug": "motherboard",
+          "customFields": [
+            {
+              "key": "Brand",
+              "value": "ASUSTeK"
+            }
+          ],
+          "brandTaxonomy": "Generic",
+          "explicitAttributes": [
+            {
+              "key": "Brand",
+              "value": "OEM"
+            }
+          ]
+        },
+        "brandList": [
+          {
+            "name": "ASUS",
+            "slug": "asus",
+            "aliases": [
+              "Asus",
+              "ASUSTeK"
+            ],
+            "skuPrefixes": [
+              "ASU-"
+            ]
+          }
+        ]
+      },
+      "expectedOutput": {
+        "brand": "ASUS",
+        "brandSlug": "asus"
+      }
+    },
+    {
+      "id": "c36ec1c1-c2bd-4416-87c9-5012736be699",
+      "label": "Placeholders No Brand, N/A, and Unknown all resolve to Other",
+      "input": {
+        "product": {
+          "id": "b12",
+          "sku": "S12",
+          "title": "USB Hub",
+          "categorySlug": "accessories",
+          "customFields": [
+            {
+              "key": "Brand",
+              "value": "Unknown"
+            }
+          ],
+          "brandTaxonomy": "No Brand",
+          "explicitAttributes": [
+            {
+              "key": "Brand",
+              "value": "N/A"
+            }
+          ]
+        },
+        "brandList": []
+      },
+      "expectedOutput": {
+        "brand": "Other",
+        "brandSlug": "other"
+      }
+    }
+  ]
+}

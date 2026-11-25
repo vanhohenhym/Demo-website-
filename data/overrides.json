@@ -1,0 +1,9 @@
+{
+  "GIG-GPU-4070S-EAGLE": {
+    "lengthMm": "261 mm",
+    "tdp": "220W"
+  },
+  "MSI-MB-B650M-PRO": {
+    "storageInterfaces": "M.2 NVMe, SATA III"
+  }
+}

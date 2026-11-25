@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f2f4f8;
+  --foreground: #111827;
+  --brand-navy: #081621;
+  --brand-orange: #ef4a23;
+  --brand-blue: #3749bb;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Global accessible focus ring fallback */
+:where(a, button, input, textarea, select, [tabindex="0"]):focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: 2px;
+}
+
+/* Hide scrollbars on horizontal category nav and carousel tracks while keeping scroll native */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hero Carousel Track (Modern Web Guidance: carousel) */
+.hero-carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  touch-action: manipulation;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-carousel-track {
+    scroll-behavior: smooth;
+  }
+}
+
+.hero-carousel-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+}
+
+/* Announcement Marquee (Modern Web Guidance: motion — opt-in only for no-preference) */
+@keyframes announcement-marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.announcement-marquee-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .announcement-marquee-track {
+    animation: announcement-marquee 30s linear infinite;
+  }
+
+  .announcement-marquee-viewport:hover .announcement-marquee-track,
+  .announcement-marquee-viewport:focus-within .announcement-marquee-track,
+  .announcement-marquee-track[data-paused="true"] {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-marquee-viewport {
+    overflow-x: auto;
+  }
+
+  .announcement-marquee-duplicate {
+    display: none;
+  }
+}
+
+/* Mobile Navigation Native Popover (Modern Web Guidance: navbar) */
+.mobile-nav-trigger {
+  anchor-name: --mobile-nav-trigger;
+}
+
+.mobile-nav-popover {
+  position: fixed;
+  inset: auto;
+  /* Fallback offset for browsers without CSS Anchor Positioning */
+  inset-block-start: 4rem;
+  inset-block-start: anchor(--mobile-nav-trigger bottom);
+  inset-inline-start: 0.75rem;
+  inline-size: min(90dvw, 22rem);
+  max-inline-size: calc(100dvw - 1.5rem);
+  max-block-size: calc(100dvh - 5.5rem);
+  margin: 0;
+  margin-block-start: 0.5rem;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+.mobile-nav-popover::backdrop {
+  background: rgba(8, 22, 33, 0.55);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-nav-popover {
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity 0.18s ease-out,
+      transform 0.18s ease-out,
+      display 0.18s,
+      overlay 0.18s;
+    transition-behavior: allow-discrete;
+  }
+
+  .mobile-nav-popover:is(:popover-open, .\:popover-open) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    .mobile-nav-popover:is(:popover-open, .\:popover-open) {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+}
+
+/* Flash Sale Multi-Stop Gradient Border Frame (Phase 3 Mini-Phase 3) */
+.flash-sale-frame {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(180deg, #eef0ff 0%, #e6eaff 100%) padding-box,
+    linear-gradient(125deg, #ef4a23 0%, #38bdf8 48%, #3749bb 100%) border-box;
+}
+
+/* High contrast mode safeguards */
+@media (forced-colors: active) {
+  .carousel-marker-bar[data-active="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .flash-sale-frame {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+}
+
+/* Accessible contact input native post-interaction invalid state */
+.contact-input:user-invalid {
+  border-color: #dc2626;
+}
+
+/* Print styles for PC Builder */
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

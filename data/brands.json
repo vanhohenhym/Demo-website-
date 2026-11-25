@@ -1,0 +1,155 @@
+[
+  {
+    "name": "ASUS",
+    "slug": "asus",
+    "logo": "/images/brands/asus.png",
+    "aliases": ["Asus", "ASUSTeK", "ASUSTeK Computer", "ASUS ROG", "ASUS TUF"],
+    "skuPrefixes": ["ASU-", "ASUS-"],
+    "featured": true,
+    "order": 1
+  },
+  {
+    "name": "MSI",
+    "slug": "msi",
+    "logo": "/images/brands/msi.png",
+    "aliases": ["msi", "Micro-Star International", "MSI Gaming", "MSI MAG", "MSI PRO"],
+    "skuPrefixes": ["MSI-"],
+    "featured": true,
+    "order": 2
+  },
+  {
+    "name": "Gigabyte",
+    "slug": "gigabyte",
+    "logo": "/images/brands/gigabyte.png",
+    "aliases": ["GIGABYTE", "Gigabyte Technology", "AORUS", "Gigabyte AORUS"],
+    "skuPrefixes": ["GIG-", "GB-"],
+    "featured": true,
+    "order": 3
+  },
+  {
+    "name": "AMD",
+    "slug": "amd",
+    "logo": "/images/brands/amd.png",
+    "aliases": ["Advanced Micro Devices", "amd"],
+    "skuPrefixes": ["AMD-"],
+    "featured": true,
+    "order": 4
+  },
+  {
+    "name": "Intel",
+    "slug": "intel",
+    "logo": "/images/brands/intel.png",
+    "aliases": ["INTEL", "Intel Corporation"],
+    "skuPrefixes": ["INT-", "INTL-"],
+    "featured": true,
+    "order": 5
+  },
+  {
+    "name": "Corsair",
+    "slug": "corsair",
+    "logo": "/images/brands/corsair.png",
+    "aliases": ["CORSAIR", "Corsair Gaming"],
+    "skuPrefixes": ["COR-", "CRS-"],
+    "featured": true,
+    "order": 6
+  },
+  {
+    "name": "Samsung",
+    "slug": "samsung",
+    "logo": "/images/brands/samsung.png",
+    "aliases": ["SAMSUNG", "Samsung Electronics"],
+    "skuPrefixes": ["SAM-", "MZ-"],
+    "featured": true,
+    "order": 7
+  },
+  {
+    "name": "Kingston",
+    "slug": "kingston",
+    "logo": "/images/brands/kingston.png",
+    "aliases": ["KINGSTON", "Kingston Fury"],
+    "skuPrefixes": ["KNG-", "KF-"],
+    "featured": false,
+    "order": 8
+  },
+  {
+    "name": "NZXT",
+    "slug": "nzxt",
+    "logo": "/images/brands/nzxt.png",
+    "aliases": ["nzxt"],
+    "skuPrefixes": ["NZXT-", "NZX-"],
+    "featured": false,
+    "order": 9
+  },
+  {
+    "name": "Noctua",
+    "slug": "noctua",
+    "logo": "/images/brands/noctua.png",
+    "aliases": ["NOCTUA"],
+    "skuPrefixes": ["NOC-", "NH-"],
+    "featured": false,
+    "order": 10
+  },
+  {
+    "name": "DeepCool",
+    "slug": "deepcool",
+    "logo": "/images/brands/deepcool.png",
+    "aliases": ["Deepcool", "DEEPCOOL"],
+    "skuPrefixes": ["DC-", "DPC-"],
+    "featured": false,
+    "order": 11
+  },
+  {
+    "name": "Western Digital",
+    "slug": "western-digital",
+    "logo": "/images/brands/western-digital.png",
+    "aliases": ["WD", "WD_BLACK", "WD Black"],
+    "skuPrefixes": ["WD-", "WDS-"],
+    "featured": false,
+    "order": 12
+  },
+  {
+    "name": "Lian Li",
+    "slug": "lian-li",
+    "logo": "/images/brands/lian-li.png",
+    "aliases": ["LIAN LI", "LianLi"],
+    "skuPrefixes": ["LL-", "LIAN-"],
+    "featured": false,
+    "order": 13
+  },
+  {
+    "name": "Seasonic",
+    "slug": "seasonic",
+    "logo": "/images/brands/seasonic.png",
+    "aliases": ["Sea Sonic", "SEASONIC"],
+    "skuPrefixes": ["SEA-", "SSR-"],
+    "featured": false,
+    "order": 14
+  },
+  {
+    "name": "G.Skill",
+    "slug": "g-skill",
+    "logo": "/images/brands/g-skill.png",
+    "aliases": ["G.SKILL", "GSkill"],
+    "skuPrefixes": ["GSK-", "F5-"],
+    "featured": false,
+    "order": 15
+  },
+  {
+    "name": "LG",
+    "slug": "lg",
+    "logo": "/images/brands/lg.png",
+    "aliases": ["LG Electronics", "LG UltraGear"],
+    "skuPrefixes": ["LG-"],
+    "featured": false,
+    "order": 16
+  },
+  {
+    "name": "Logitech",
+    "slug": "logitech",
+    "logo": "/images/brands/logitech.png",
+    "aliases": ["Logitech G", "LOGITECH"],
+    "skuPrefixes": ["LOG-"],
+    "featured": false,
+    "order": 17
+  }
+]

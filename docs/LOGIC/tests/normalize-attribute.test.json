@@ -1,0 +1,426 @@
+{
+  "id": "c7608cb5-e463-41d5-98a2-d354c37defbd",
+  "label": "Normalize Attribute Messy Data Suite",
+  "modelType": "testSuite",
+  "description": "",
+  "testCases": [
+    {
+      "id": "d60b890f-b390-43ac-b524-1256370b1021",
+      "label": "Socket alias with spaces and hyphenated AM-5",
+      "input": {
+        "source": "explicit",
+        "rawName": "CPU Socket",
+        "rawValue": "Socket AM-5 "
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "AM5",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "socket"
+      }
+    },
+    {
+      "id": "1da1a0a9-4a79-41d8-98d7-c7319a22008c",
+      "label": "pa_socket with lowercase spaced LGA 1700 and parsed source",
+      "input": {
+        "source": "parsed",
+        "rawName": "pa_socket",
+        "rawValue": "lga 1700"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "LGA1700",
+          "source": "parsed",
+          "confidence": "medium"
+        },
+        "canonicalKey": "socket"
+      }
+    },
+    {
+      "id": "20b1627f-bdf8-4e6f-b9a5-fd1108229ffc",
+      "label": "DDR5-6000 RAM normalized to DDR5",
+      "input": {
+        "source": "explicit",
+        "rawName": "Memory Type",
+        "rawValue": "DDR5-6000 RAM"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "DDR5",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "ramType"
+      }
+    },
+    {
+      "id": "56d0a19f-8c3c-4245-b6f6-3c15d6ebd06d",
+      "label": "GDDR6X graphics memory ignored as unrecognized ramType",
+      "input": {
+        "source": "parsed",
+        "rawName": "Memory Type",
+        "rawValue": "16GB GDDR6X"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "ramType"
+      }
+    },
+    {
+      "id": "8a05d6b7-e5ba-4d1f-8965-5b1943b7d292",
+      "label": "Micro ATX normalized to mATX",
+      "input": {
+        "source": "explicit",
+        "rawName": "form-factor",
+        "rawValue": "Micro ATX"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "mATX",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "formFactor"
+      }
+    },
+    {
+      "id": "b17d0989-e091-406b-8d5e-af647672ccf2",
+      "label": "E-ATX normalized to EATX",
+      "input": {
+        "source": "explicit",
+        "rawName": "pa_form_factor",
+        "rawValue": "E-ATX"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "EATX",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "formFactor"
+      }
+    },
+    {
+      "id": "df15f6cf-3a30-453b-bf49-a19fa2ba882c",
+      "label": "Mini ITX normalized to Mini-ITX",
+      "input": {
+        "source": "explicit",
+        "rawName": "Board Form Factor",
+        "rawValue": "Mini ITX"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "Mini-ITX",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "formFactor"
+      }
+    },
+    {
+      "id": "73508f71-e8e0-4fcf-9617-948e0287905c",
+      "label": "750 Watt normalized to 750 number",
+      "input": {
+        "source": "parsed",
+        "rawName": "Output Power",
+        "rawValue": "750 Watt"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "wattage",
+        "numberResult": {
+          "value": 750,
+          "source": "parsed",
+          "confidence": "medium"
+        }
+      }
+    },
+    {
+      "id": "85505dc5-010c-4fca-8788-a7927e4ea020",
+      "label": "33.6 cm converted to 336 mm with override source",
+      "input": {
+        "source": "override",
+        "rawName": "Card Length",
+        "rawValue": "33.6 cm",
+        "categoryHint": "gpu"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "lengthMm",
+        "numberResult": {
+          "value": 336,
+          "source": "override",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "8a79b1be-32d8-4fa6-a3cd-930e2c75833f",
+      "label": "Case category promotes Length alias to maxGpuLengthMm",
+      "input": {
+        "source": "explicit",
+        "rawName": "Length",
+        "rawValue": "360 mm",
+        "categoryHint": "case"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "maxGpuLengthMm",
+        "numberResult": {
+          "value": 360,
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "bb9cf36d-c68f-4bf5-991c-81b72e02a586",
+      "label": "NVMe variant normalized to M.2 NVMe",
+      "input": {
+        "source": "explicit",
+        "rawName": "Storage Interface",
+        "rawValue": "PCIe 4.0 M.2 NVMe"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "M.2 NVMe",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "storageInterface"
+      }
+    },
+    {
+      "id": "95b20c38-18ac-4fae-9b61-75560f5a9157",
+      "label": "Unmapped attribute returns matched false and absent results",
+      "input": {
+        "source": "explicit",
+        "rawName": "RGB Lighting",
+        "rawValue": "Addressable RGB"
+      },
+      "expectedOutput": {
+        "matched": false
+      }
+    },
+    {
+      "id": "7b942493-3c1a-4a38-84cb-c8fd0b54773a",
+      "label": "Thousands separator 1,200W normalized to 1200",
+      "input": {
+        "source": "explicit",
+        "rawName": "Wattage",
+        "rawValue": "1,200W",
+        "componentType": "psu"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "wattage",
+        "numberResult": {
+          "value": 1200,
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "41e593f0-fa94-4b44-8564-a946d3d87075",
+      "label": "Kilowatts 1.2kW converted to 1200W",
+      "input": {
+        "source": "explicit",
+        "rawName": "Wattage",
+        "rawValue": "1.2kW",
+        "componentType": "psu"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "wattage",
+        "numberResult": {
+          "value": 1200,
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "344bae21-2ebb-41ed-a9d5-de299df64957",
+      "label": "Adjacent unit 320 mm (12.6 in) returns 320",
+      "input": {
+        "source": "explicit",
+        "rawName": "Length",
+        "rawValue": "320 mm (12.6 in)",
+        "componentType": "gpu"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "lengthMm",
+        "numberResult": {
+          "value": 320,
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "b0941eae-7210-492a-b81b-c68010fb019f",
+      "label": "First number+unit pair 12.6 in (32 cm) converts to 320",
+      "input": {
+        "source": "explicit",
+        "rawName": "Length",
+        "rawValue": "12.6 in (32 cm)",
+        "componentType": "gpu"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "lengthMm",
+        "numberResult": {
+          "value": 320,
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "7799d2c5-05eb-44c4-8175-58a0833a1a9e",
+      "label": "Dimension 700 mm outside 50-600 mm range returns absent",
+      "input": {
+        "source": "explicit",
+        "rawName": "Length",
+        "rawValue": "700 mm",
+        "componentType": "gpu"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "lengthMm"
+      }
+    },
+    {
+      "id": "92dc9191-7229-4a82-b249-a97d69d284ed",
+      "label": "coolerSockets splits delimiters and drops unrecognized items",
+      "input": {
+        "source": "explicit",
+        "rawName": "Supported Sockets",
+        "rawValue": "AM4 / AM5, LGA 1700 and Unknown",
+        "componentType": "cooler"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "listResult": {
+          "value": [
+            "AM4",
+            "AM5",
+            "LGA1700"
+          ],
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "coolerSockets"
+      }
+    },
+    {
+      "id": "fd77d6dc-a9d8-48f2-a4fb-03b6f6355928",
+      "label": "storageInterfaces splits delimiters and treats M.2 PCIe as M.2 NVMe",
+      "input": {
+        "source": "explicit",
+        "rawName": "Storage Support",
+        "rawValue": "M.2 PCIe, SATA III and BadPort",
+        "componentType": "motherboard"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "listResult": {
+          "value": [
+            "M.2 NVMe",
+            "SATA III"
+          ],
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "storageInterfaces"
+      }
+    },
+    {
+      "id": "9dc53c3b-e54b-4a0e-b8dc-f480fc488e99",
+      "label": "Power Consumption routes to tdp for cpu componentType",
+      "input": {
+        "source": "explicit",
+        "rawName": "Power Consumption",
+        "rawValue": "120W",
+        "componentType": "cpu"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "canonicalKey": "tdp",
+        "numberResult": {
+          "value": 120,
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "bbcf221d-8967-4384-b336-18df2f9a8be3",
+      "label": "Mini-DTX with trailing size text normalizes to Mini-ITX",
+      "input": {
+        "source": "explicit",
+        "rawName": "Form Factor",
+        "rawValue": "Mini-DTX (6.7 x 8.0 in)",
+        "componentType": "motherboard"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "Mini-ITX",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "formFactor"
+      }
+    },
+    {
+      "id": "e3242043-8167-4c98-a8e9-4550c3bf2088",
+      "label": "Standard ATX with trailing size text normalizes to ATX",
+      "input": {
+        "source": "explicit",
+        "rawName": "Form Factor",
+        "rawValue": "Standard ATX (12 x 9.6 in)",
+        "componentType": "motherboard"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "ATX",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "formFactor"
+      }
+    },
+    {
+      "id": "27256593-9f01-4e5a-895b-07db9fb5eb69",
+      "label": "Extended socket vocabulary recognizes LGA2011-3",
+      "input": {
+        "source": "explicit",
+        "rawName": "Socket",
+        "rawValue": "LGA2011-3",
+        "componentType": "cpu"
+      },
+      "expectedOutput": {
+        "matched": true,
+        "textResult": {
+          "value": "LGA2011-3",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "canonicalKey": "socket"
+      }
+    }
+  ]
+}

@@ -1,0 +1,386 @@
+{
+  "id": "346f8d7d-2975-49e0-b95b-f5d9da92bade",
+  "label": "Extract Attributes Messy Data Suite",
+  "modelType": "testSuite",
+  "description": "",
+  "testCases": [
+    {
+      "id": "e4c2fac3-bdf1-42a2-a3be-4c5e8ac2584a",
+      "label": "Explicit CMS attribute wins over custom field and title",
+      "input": {
+        "product": {
+          "id": "p1",
+          "sku": "S1",
+          "title": "Ryzen 7 7800X3D AM4",
+          "categorySlug": "cpu",
+          "customFields": [
+            {
+              "key": "socket",
+              "value": "AM4"
+            }
+          ],
+          "explicitAttributes": [
+            {
+              "key": "CPU Socket",
+              "value": "Socket AM5"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "socket": {
+          "value": "AM5",
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "unmappedAttributes": []
+      }
+    },
+    {
+      "id": "86a01a39-58a7-4a99-a5c2-054bd2dbe1b7",
+      "label": "Custom field explicit wins over description spec table",
+      "input": {
+        "product": {
+          "id": "p2",
+          "sku": "S2",
+          "title": "Ryzen 7",
+          "categorySlug": "cpu",
+          "customFields": [
+            {
+              "key": "pa_tdp",
+              "value": "120W"
+            }
+          ],
+          "descriptionSpecs": [
+            {
+              "key": "TDP",
+              "value": "65W"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "tdp": {
+          "value": 120,
+          "source": "explicit",
+          "confidence": "high"
+        },
+        "unmappedAttributes": []
+      }
+    },
+    {
+      "id": "75656973-6887-4731-8be9-037a15af49db",
+      "label": "Description spec table parsed wins over title extraction",
+      "input": {
+        "product": {
+          "id": "p3",
+          "sku": "S3",
+          "title": "MSI B650 DDR4",
+          "categorySlug": "motherboard",
+          "descriptionSpecs": [
+            {
+              "key": "Memory Type",
+              "value": "DDR5-6000"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "ramType": {
+          "value": "DDR5",
+          "source": "parsed",
+          "confidence": "medium"
+        },
+        "unmappedAttributes": []
+      }
+    },
+    {
+      "id": "4dd9bbd9-3748-4d2f-ad61-3d04b122347a",
+      "label": "Title extraction parses LGA 1700 and Micro-ATX with medium confidence",
+      "input": {
+        "product": {
+          "id": "p4",
+          "sku": "S4",
+          "title": "ASUS PRIME B760M LGA 1700 Micro-ATX Motherboard",
+          "categorySlug": "motherboard"
+        }
+      },
+      "expectedOutput": {
+        "socket": {
+          "value": "LGA1700",
+          "source": "parsed",
+          "confidence": "medium"
+        },
+        "formFactor": {
+          "value": "mATX",
+          "source": "parsed",
+          "confidence": "medium"
+        }
+      }
+    },
+    {
+      "id": "48b1ae8f-d60a-4301-a457-aeaa219eb212",
+      "label": "PSU wattage extracted from title 850W token",
+      "input": {
+        "product": {
+          "id": "p5",
+          "sku": "S5",
+          "title": "Corsair RM850x 850W 80+ Gold PSU",
+          "categorySlug": "psu"
+        }
+      },
+      "expectedOutput": {
+        "wattage": {
+          "value": 850,
+          "source": "parsed",
+          "confidence": "medium"
+        }
+      }
+    },
+    {
+      "id": "4520d91a-ffc6-4f7d-afd5-e5dd57083b69",
+      "label": "SKU override fills missing lengthMm with high confidence and ignores GDDR6X",
+      "input": {
+        "product": {
+          "id": "p6",
+          "sku": "GPU-336",
+          "title": "RTX 4080 16GB GDDR6X",
+          "categorySlug": "gpu",
+          "skuOverrides": [
+            {
+              "key": "lengthMm",
+              "value": "33.6 cm"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "lengthMm": {
+          "value": 336,
+          "source": "override",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "545577b9-c84f-4edf-9061-7fb2e3ef6293",
+      "label": "Unmapped attributes collected and deduplicated across layers",
+      "input": {
+        "product": {
+          "id": "p7",
+          "sku": "C7",
+          "title": "Mid Tower Case",
+          "categorySlug": "case",
+          "customFields": [
+            {
+              "key": "Warranty Years",
+              "value": "3"
+            }
+          ],
+          "descriptionSpecs": [
+            {
+              "key": "RGB Zones",
+              "value": "4"
+            }
+          ],
+          "explicitAttributes": [
+            {
+              "key": "RGB Zones",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "unmappedAttributes": [
+          "RGB Zones",
+          "Warranty Years"
+        ]
+      }
+    },
+    {
+      "id": "24aa3b6d-d4ec-45fb-ac9f-1e9585977d9e",
+      "label": "NVMe storage interface extracted from title",
+      "input": {
+        "product": {
+          "id": "p8",
+          "sku": "SSD8",
+          "title": "Samsung 990 Pro 2TB NVMe SSD",
+          "categorySlug": "storage"
+        }
+      },
+      "expectedOutput": {
+        "storageInterface": {
+          "value": "M.2 NVMe",
+          "source": "parsed",
+          "confidence": "medium"
+        }
+      }
+    },
+    {
+      "id": "388b0a47-dceb-4a51-bd16-cc494fd16f73",
+      "label": "Case Length attribute promoted to maxGpuLengthMm and converted from cm",
+      "input": {
+        "product": {
+          "id": "p9",
+          "sku": "C9",
+          "title": "Airflow Case",
+          "categorySlug": "case",
+          "explicitAttributes": [
+            {
+              "key": "Length",
+              "value": "36 cm"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "maxGpuLengthMm": {
+          "value": 360,
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "ff1cc8a4-cfa7-4c4e-ad17-a325e142dfd8",
+      "label": "Unrecognized socket value recorded in unrecognizedValues without guessing",
+      "input": {
+        "product": {
+          "id": "p10",
+          "sku": "G10",
+          "title": "Generic Graphics Card",
+          "categorySlug": "gpu",
+          "explicitAttributes": [
+            {
+              "key": "Color",
+              "value": "Black"
+            },
+            {
+              "key": "Socket",
+              "value": "Universal"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "unmappedAttributes": [
+          "Color"
+        ],
+        "unrecognizedValues": [
+          {
+            "reason": "Unrecognized socket value",
+            "rawValue": "Universal",
+            "attributeName": "Socket"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3d940a74-812b-42fd-81d2-d89687704f32",
+      "label": "SKU override wins over explicit CMS attribute",
+      "input": {
+        "product": {
+          "id": "p11",
+          "sku": "OVR-1",
+          "title": "Ryzen AM4",
+          "categorySlug": "cpu",
+          "skuOverrides": [
+            {
+              "key": "Socket",
+              "value": "AM5"
+            }
+          ],
+          "componentType": "cpu",
+          "explicitAttributes": [
+            {
+              "key": "Socket",
+              "value": "AM4"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "socket": {
+          "value": "AM5",
+          "source": "override",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "a58ccf06-04f0-4a3f-8c12-1326dedcd465",
+      "label": "extract_attributes populates coolerSockets list attribute",
+      "input": {
+        "product": {
+          "id": "p12",
+          "sku": "CL-12",
+          "title": "Tower Cooler",
+          "categorySlug": "cooler",
+          "componentType": "cooler",
+          "explicitAttributes": [
+            {
+              "key": "Supported Sockets",
+              "value": "AM5, LGA 1700"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "coolerSockets": {
+          "value": [
+            "AM5",
+            "LGA1700"
+          ],
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "6a4c16a1-4e79-4f26-8738-d299eb5cc423",
+      "label": "extract_attributes populates storageInterfaces list attribute",
+      "input": {
+        "product": {
+          "id": "p13",
+          "sku": "MB-13",
+          "title": "B650 Board",
+          "categorySlug": "motherboard",
+          "componentType": "motherboard",
+          "explicitAttributes": [
+            {
+              "key": "Supported Interfaces",
+              "value": "M.2 PCIe / SATA III"
+            }
+          ]
+        }
+      },
+      "expectedOutput": {
+        "storageInterfaces": {
+          "value": [
+            "M.2 NVMe",
+            "SATA III"
+          ],
+          "source": "explicit",
+          "confidence": "high"
+        }
+      }
+    },
+    {
+      "id": "23579c9e-6eff-49c2-a30c-3d0178e3208b",
+      "label": "Title extraction gated by componentType and word boundaries ignores AM50 DDR5 ATX on GPU",
+      "input": {
+        "product": {
+          "id": "p14",
+          "sku": "G14",
+          "title": "RTX 4070 AM50 DDR5 ATX Edition",
+          "categorySlug": "gpu",
+          "componentType": "gpu"
+        }
+      },
+      "expectedOutput": {
+        "unrecognizedValues": []
+      }
+    }
+  ]
+}

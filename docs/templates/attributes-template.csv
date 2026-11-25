@@ -1,0 +1,9 @@
+sku,name,category,component_type,brand,price,socket,ram_type,form_factor,tdp,wattage,length_mm,max_gpu_length_mm,cooler_sockets,storage_interface,storage_interfaces
+MB-B650-TUF,ASUS TUF GAMING B650-PLUS WIFI,motherboard,motherboard,ASUS,21500,AM5,DDR5,ATX,,,,,,,M.2 NVMe;SATA III
+CPU-RYZ-7600X,AMD Ryzen 5 7600X Processor,cpu,cpu,AMD,23500,AM5,,,105,,,,,,
+RAM-COR-32D5,Corsair Vengeance 32GB DDR5-6000,ram,ram,Corsair,13500,,DDR5,,,,,,,,
+GPU-RTX4070-MSI,MSI GeForce RTX 4070 Ventus 2X,gpu,gpu,MSI,68000,,,,200,,242,,,,
+PSU-COR-750,Corsair RM750e 750W 80 Plus Gold,psu,psu,Corsair,11500,,,,,750,,,,,
+CASE-NZXT-H5,NZXT H5 Flow Compact Mid-Tower,case,case,NZXT,9500,,,ATX,,,,365,,,
+COOL-AK620,DeepCool AK620 Dual-Tower CPU Cooler,cooler,cooler,DeepCool,6200,,,,,,,,AM4;AM5;LGA1700;LGA1200,,
+SSD-SAM-980PRO,Samsung 980 PRO 1TB PCIe 4.0 NVMe SSD,storage,storage,Samsung,12000,,,,,,,,,"M.2 NVMe",
