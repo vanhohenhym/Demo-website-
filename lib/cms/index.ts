@@ -50,6 +50,14 @@ export {
   summarizeUnmappedAttributes,
 } from "./query-engine.ts";
 export {
+  COMPONENT_MENU_ITEMS,
+  COMPONENT_SUBCATEGORIES,
+  COMPONENT_SUBCATEGORY_SLUGS,
+  buildMissingComponentSeedCategories,
+  resolveComponentCategoryLabel,
+  type ComponentNavItem,
+} from "./component-categories.ts";
+export {
   CustomCmsAdapter,
   type CustomCmsAdapterOptions,
   type CustomCmsPreviewProduct,

@@ -1,7 +1,17 @@
 import React from "react";
 import Link from "next/link";
-import { Search, Gift, Zap, User, Menu, X } from "lucide-react";
+import {
+  Search,
+  Gift,
+  Zap,
+  User,
+  Menu,
+  X,
+  ChevronRight,
+  ChevronDown,
+} from "lucide-react";
 import { MobileNavDrawer } from "@/components/layout/MobileNavDrawer";
+import { COMPONENT_MENU_ITEMS } from "@/lib/cms/component-categories";
 
 export const CATEGORIES = [
   { name: "Appliance", slug: "appliance" },
@@ -193,6 +203,33 @@ export function Header() {
                   </li>
                 ))}
               </ul>
+              <details className="mt-3 border-t border-white/10 pt-3 group">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-1 text-[11px] font-semibold uppercase tracking-wider text-brand-orange">
+                  <span>Component Categories</span>
+                  <ChevronDown
+                    className="h-3.5 w-3.5 transition-transform group-open:rotate-180"
+                    aria-hidden="true"
+                  />
+                </summary>
+                <ul className="mt-2 grid grid-cols-1 gap-0.5 text-xs">
+                  {COMPONENT_MENU_ITEMS.map((sub) => (
+                    <li key={sub.slug}>
+                      <Link
+                        href={`/category/${sub.slug}`}
+                        className="flex items-center justify-between rounded-control px-2.5 py-1.5 text-gray-200 hover:bg-white/10 hover:text-brand-orange transition-colors"
+                      >
+                        <span>{sub.name}</span>
+                        {sub.hasChildren ? (
+                          <ChevronRight
+                            className="h-3 w-3 text-brand-orange flex-shrink-0"
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </details>
             </MobileNavDrawer>
 
             <Link
@@ -306,18 +343,60 @@ export function Header() {
         aria-label="Categories"
         className="w-full bg-white border-b border-brand-border shadow-nav"
       >
-        <div className="max-w-site mx-auto px-3 sm:px-4 overflow-x-auto no-scrollbar">
+        <div className="max-w-site mx-auto px-3 sm:px-4 overflow-x-auto lg:overflow-visible no-scrollbar">
           <ul className="flex items-center justify-between gap-1 xl:gap-0 whitespace-nowrap">
-            {CATEGORIES.map((cat) => (
-              <li key={cat.slug} className="flex-shrink-0">
-                <Link
-                  href={`/category/${cat.slug}`}
-                  className="inline-flex items-center px-2.5 xl:px-1.5 py-3 text-[13px] font-semibold text-brand-textMain hover:text-brand-orange transition-colors"
-                >
-                  {cat.name}
-                </Link>
-              </li>
-            ))}
+            {CATEGORIES.map((cat) => {
+              if (cat.slug === "component") {
+                return (
+                  <li
+                    key={cat.slug}
+                    className="relative flex-shrink-0 group/component"
+                  >
+                    <Link
+                      href={`/category/${cat.slug}`}
+                      aria-haspopup="menu"
+                      className="inline-flex items-center gap-0.5 px-2.5 xl:px-1.5 py-3 text-[13px] font-semibold text-brand-textMain hover:text-brand-orange group-hover/component:text-brand-orange transition-colors"
+                    >
+                      <span>{cat.name}</span>
+                    </Link>
+
+                    <div
+                      role="menu"
+                      aria-label="Component categories"
+                      className="invisible opacity-0 pointer-events-none lg:group-hover/component:visible lg:group-hover/component:opacity-100 lg:group-hover/component:pointer-events-auto lg:group-focus-within/component:visible lg:group-focus-within/component:opacity-100 lg:group-focus-within/component:pointer-events-auto absolute left-0 top-full z-50 w-60 border border-brand-border border-t-[3px] border-t-brand-orange bg-white py-1 shadow-dropdown transition-all duration-150"
+                    >
+                      {COMPONENT_MENU_ITEMS.map((sub) => (
+                        <Link
+                          key={sub.slug}
+                          role="menuitem"
+                          href={`/category/${sub.slug}`}
+                          className="flex items-center justify-between px-3.5 py-1.5 text-[13px] font-normal text-brand-textMain hover:bg-brand-orange hover:text-white group/subitem transition-colors"
+                        >
+                          <span>{sub.name}</span>
+                          {sub.hasChildren ? (
+                            <ChevronRight
+                              className="h-3 w-3 text-brand-orange group-hover/subitem:text-white flex-shrink-0"
+                              aria-hidden="true"
+                            />
+                          ) : null}
+                        </Link>
+                      ))}
+                    </div>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={cat.slug} className="flex-shrink-0">
+                  <Link
+                    href={`/category/${cat.slug}`}
+                    className="inline-flex items-center px-2.5 xl:px-1.5 py-3 text-[13px] font-semibold text-brand-textMain hover:text-brand-orange transition-colors"
+                  >
+                    {cat.name}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </nav>

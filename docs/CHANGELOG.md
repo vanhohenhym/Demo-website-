@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-11-28] - Component Sub-Category Menu & `/category/component` Navigation
+### Added
+- `lib/cms/component-categories.ts`: Canonical `COMPONENT_SUBCATEGORIES` (16 PC component categories: `Processor`, `CPU Cooler`, `Motherboard`, `Graphics Card`, `RAM (Desktop)`, `RAM (Laptop)`, `Power Supply`, `Hard Disk Drive`, `Portable Hard Disk Drive`, `SSD`, `Portable SSD`, `Casing`, `Casing Cooler`, `Optical Disk Drive`, `Vertical GPU Holder`, `Water / Liquid Cooling`), `COMPONENT_MENU_ITEMS` (+ `Show All Component`), `resolveComponentCategoryLabel()`, and `buildMissingComponentSeedCategories()` re-exported via `lib/cms/index.ts`.
+- `components/catalog/ComponentNavStrip.tsx`: Sub-category pill strip (`Components: Processor | CPU Cooler | ... | Show All Component`) displayed on `/category/component`.
+### Changed
+- `components/layout/Header.tsx`: Added hover/focus-within `Component` dropdown menu on desktop (17 items with orange `▸` chevrons on the first 13 sub-trees, `lg:overflow-visible` on nav wrapper) and collapsible `Component Categories` section inside `<MobileNavDrawer>`.
+- `app/category/[category]/page.tsx` & `app/category/[category]/[brand]/page.tsx`: Replaced `"Brands:"` `<BrandNavStrip>` with `<ComponentNavStrip>` on `/category/component`, and resolved exact labels from `resolveComponentCategoryLabel()` (e.g. `RAM (Desktop)`, `Water / Liquid Cooling`, `SSD`).
+- `lib/cms/field-map.ts`, `lib/cms/query-engine.ts`, `lib/cms/adapters/mock.ts`, `lib/cms/custom-store.ts`: Registered all 16 Component slugs in `COMPONENT_TYPE_SLUG_MAP` and `RAW_MOCK_CATEGORIES`, enhanced `matchesCategorySlug()` for split RAM/Storage/Cooler and `component` parent queries, and auto-merged missing `COMPONENT_SUBCATEGORIES` into already-seeded KV/JSON catalogs.
+- `tests/catalog/query-and-url.test.ts` & `tests/cms/custom-cms.test.ts`: Added tests for Component sub-category list completeness, `matchesCategorySlug()` split category resolution, and KV/JSON store hydration.
+- Updated `docs/COMPONENTS.md`, `docs/CMS_ADAPTER.md`, and `docs/CHANGELOG.md`.
+
 ## [2026-11-28] - Built-In Custom CMS, Admin Dashboard (`/admin`), Cloudflare KV Store & Live Preview
 ### Added
 - `lib/cms/custom-store.ts` & `lib/cms/adapters/custom.ts`: Unified `CustomCmsStorageDriver` (`env.CMS_STORE` Cloudflare KV binding via dynamic `cloudflare:workers` import in production, `.data/custom-cms.json` + in-memory fallback locally) and `CustomCmsAdapter` (`providerName = "custom"`) with auto-seeding from mock data, serialized write lock, automatic cache invalidation, strict published-only storefront filtering, and draft/live preview methods (`getAllProductsAdmin`, `getProductBySlugIncludingDrafts`, `getProductPreviewBySlug`).

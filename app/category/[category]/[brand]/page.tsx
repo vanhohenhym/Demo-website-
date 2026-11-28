@@ -2,7 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Cpu } from "lucide-react";
-import { getCmsAdapter } from "@/lib/cms";
+import { getCmsAdapter, resolveComponentCategoryLabel } from "@/lib/cms";
 import { toCatalogProduct } from "@/lib/cms/types";
 import {
   AUDITED_HEALTH_CATEGORY_SLUGS,
@@ -54,6 +54,10 @@ function resolveCategoryDisplayName(
   }
   if (categorySlug.trim().toLowerCase() === "all") {
     return "All Products";
+  }
+  const componentLabel = resolveComponentCategoryLabel(categorySlug);
+  if (componentLabel) {
+    return componentLabel;
   }
   const headerCat = CATEGORIES.find((c) => c.slug === categorySlug);
   return headerCat ? headerCat.name : formatSlugLabel(categorySlug);

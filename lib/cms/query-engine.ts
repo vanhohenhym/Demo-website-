@@ -7,6 +7,7 @@ import type {
   Product,
   UnmappedAttributeSummary,
 } from "./types.ts";
+import { COMPONENT_SUBCATEGORY_SLUGS } from "./component-categories.ts";
 
 export function getEffectivePrice(product: Product): number | undefined {
   if (product.price === undefined) {
@@ -246,6 +247,45 @@ const GAMING_PARENT_TYPES: ReadonlySet<ComponentType> = new Set([
   "mouse",
 ]);
 
+function hasExplicitSubSlug(product: Product, targetSlug: string): boolean {
+  return Boolean(
+    product.subCategorySlugs?.some(
+      (sub) => sub.trim().toLowerCase() === targetSlug
+    )
+  );
+}
+
+function hasProductKeyword(product: Product, pattern: RegExp): boolean {
+  const candidates: string[] = [
+    product.name,
+    product.categorySlug,
+    ...(product.subCategorySlugs ?? []),
+    product.attributes.formFactor?.value ?? "",
+    ...(product.attributes.storageInterfaces?.value ?? []),
+  ];
+  return candidates.some((text) => pattern.test(text));
+}
+
+function isLaptopRamProduct(product: Product): boolean {
+  return (
+    product.categorySlug.trim().toLowerCase() === "ram-laptop" ||
+    product.categorySlug.trim().toLowerCase() === "laptop-ram" ||
+    hasExplicitSubSlug(product, "ram-laptop") ||
+    hasProductKeyword(product, /\b(laptop|so-?dimm|sodimm|notebook)\b/i)
+  );
+}
+
+function isPortableStorageProduct(product: Product): boolean {
+  return hasProductKeyword(product, /\b(portable|external)\b|usb-?c/i);
+}
+
+function isHddProduct(product: Product): boolean {
+  return hasProductKeyword(
+    product,
+    /\b(hdd|hard disk|hard drive|7200\s*rpm|5400\s*rpm)\b/i
+  );
+}
+
 /**
  * Matches a normalized product against a category slug, supporting direct category/componentType/subCategorySlugs
  * matches as well as top-level parent/group categories across catalog queries, counts, and brand projection.
@@ -263,18 +303,82 @@ export function matchesCategorySlug(
   if (
     productCategorySlug === slug ||
     product.componentType.trim().toLowerCase() === slug ||
-    Boolean(
-      product.subCategorySlugs?.some(
-        (subSlug) => subSlug.trim().toLowerCase() === slug
-      )
-    )
+    hasExplicitSubSlug(product, slug)
   ) {
     return true;
   }
 
   switch (slug) {
     case "component":
-      return COMPONENT_PARENT_TYPES.has(product.componentType);
+      return (
+        COMPONENT_PARENT_TYPES.has(product.componentType) ||
+        COMPONENT_SUBCATEGORY_SLUGS.has(productCategorySlug) ||
+        Boolean(
+          product.subCategorySlugs?.some((sub) =>
+            COMPONENT_SUBCATEGORY_SLUGS.has(sub.trim().toLowerCase())
+          )
+        )
+      );
+    case "processor":
+      return product.componentType === "cpu" || productCategorySlug === "cpu";
+    case "graphics-card":
+      return product.componentType === "gpu" || productCategorySlug === "gpu";
+    case "power-supply":
+      return product.componentType === "psu" || productCategorySlug === "psu";
+    case "casing":
+      return product.componentType === "case" || productCategorySlug === "case";
+    case "cpu-cooler":
+      return (
+        product.componentType === "cooler" &&
+        productCategorySlug !== "casing-cooler" &&
+        !hasExplicitSubSlug(product, "casing-cooler")
+      );
+    case "water-liquid-cooling":
+      return (
+        product.componentType === "cooler" &&
+        hasProductKeyword(product, /\b(liquid|water|aio)\b/i)
+      );
+    case "ram-desktop":
+      return product.componentType === "ram" && !isLaptopRamProduct(product);
+    case "ram-laptop":
+      return product.componentType === "ram" && isLaptopRamProduct(product);
+    case "ssd":
+      return (
+        product.componentType === "storage" &&
+        productCategorySlug !== "portable-ssd" &&
+        productCategorySlug !== "hard-disk-drive" &&
+        productCategorySlug !== "portable-hard-disk-drive" &&
+        productCategorySlug !== "hdd" &&
+        !hasExplicitSubSlug(product, "portable-ssd") &&
+        !hasExplicitSubSlug(product, "hard-disk-drive") &&
+        !hasExplicitSubSlug(product, "portable-hard-disk-drive") &&
+        !isPortableStorageProduct(product) &&
+        !isHddProduct(product)
+      );
+    case "portable-ssd":
+      return (
+        product.componentType === "storage" &&
+        productCategorySlug !== "hard-disk-drive" &&
+        productCategorySlug !== "portable-hard-disk-drive" &&
+        productCategorySlug !== "hdd" &&
+        isPortableStorageProduct(product) &&
+        !isHddProduct(product)
+      );
+    case "hard-disk-drive":
+      return (
+        productCategorySlug === "hdd" ||
+        (product.componentType === "storage" &&
+          productCategorySlug !== "portable-hard-disk-drive" &&
+          !hasExplicitSubSlug(product, "portable-hard-disk-drive") &&
+          isHddProduct(product) &&
+          !isPortableStorageProduct(product))
+      );
+    case "portable-hard-disk-drive":
+      return (
+        product.componentType === "storage" &&
+        isHddProduct(product) &&
+        isPortableStorageProduct(product)
+      );
     case "power":
       return (
         product.componentType === "psu" ||

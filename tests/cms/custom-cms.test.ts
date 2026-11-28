@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, describe, it } from "node:test";
 import {
+  COMPONENT_SUBCATEGORIES,
   CustomCmsAdapter,
   MockCmsAdapter,
   RAW_MOCK_CATEGORIES,
@@ -353,6 +354,36 @@ describe("Custom CMS Storage & Adapter", () => {
       assert.strictEqual(await deleteCustomCategory("ups-power"), false);
       const afterCats = await adapter.getCategories();
       assert.ok(!afterCats.some((c) => c.slug === "ups-power"));
+    });
+
+    it("hydrates missing component subcategories into already-seeded KV/JSON stores", async () => {
+      const legacyDriver = createMemoryStorageDriver();
+      await legacyDriver.put(
+        "custom-cms:catalog",
+        JSON.stringify({
+          version: 1,
+          seededAt: "2026-11-27T00:00:00Z",
+          updatedAt: "2026-11-27T00:00:00Z",
+          categories: [
+            {
+              id: "cat-motherboard",
+              name: "Motherboard",
+              slug: "motherboard",
+            },
+          ],
+          products: [],
+        })
+      );
+      setCustomStoreDriver(legacyDriver);
+
+      const categories = await listCustomCategories();
+      const slugs = new Set(categories.map((c) => c.slug));
+      for (const comp of COMPONENT_SUBCATEGORIES) {
+        assert.ok(
+          slugs.has(comp.slug),
+          `Expected missing component subcategory ${comp.slug} to be merged into store`
+        );
+      }
     });
 
     it("supports media save, metadata listing, binary fetch, and deletion", async () => {

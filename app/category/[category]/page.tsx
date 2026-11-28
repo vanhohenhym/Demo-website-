@@ -25,10 +25,12 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CATEGORIES } from "@/components/layout/Header";
 import { BrandNavStrip } from "@/components/catalog/BrandNavStrip";
+import { ComponentNavStrip } from "@/components/catalog/ComponentNavStrip";
 import { FilterSidebar } from "@/components/catalog/FilterSidebar";
 import { SortSelector } from "@/components/catalog/SortSelector";
 import { Pagination } from "@/components/catalog/Pagination";
 import { ProductCard } from "@/components/catalog/ProductCard";
+import { resolveComponentCategoryLabel } from "@/lib/cms";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +56,10 @@ function resolveCategoryDisplayName(
   }
   if (categorySlug.trim().toLowerCase() === "all") {
     return "All Products";
+  }
+  const componentLabel = resolveComponentCategoryLabel(categorySlug);
+  if (componentLabel) {
+    return componentLabel;
   }
   const headerCat = CATEGORIES.find((c) => c.slug === categorySlug);
   return headerCat ? headerCat.name : formatSlugLabel(categorySlug);
@@ -251,17 +257,29 @@ export default async function CategoryPage({
         <SortSelector basePath={basePath} query={effectiveQuery} />
       </div>
 
-      {/* Dynamic Brand Strip */}
-      <BrandNavStrip
-        categorySlug={category}
-        brands={brands}
-        builder={effectiveQuery.builder}
-        slot={effectiveQuery.slot}
-        sockets={effectiveQuery.sockets}
-        ramTypes={effectiveQuery.ramTypes}
-        formFactors={effectiveQuery.formFactors}
-        storageInterfaces={effectiveQuery.storageInterfaces}
-      />
+      {/* Dynamic Sub-Category or Brand Strip */}
+      {category.trim().toLowerCase() === "component" ? (
+        <ComponentNavStrip
+          activeCategorySlug={category}
+          builder={effectiveQuery.builder}
+          slot={effectiveQuery.slot}
+          sockets={effectiveQuery.sockets}
+          ramTypes={effectiveQuery.ramTypes}
+          formFactors={effectiveQuery.formFactors}
+          storageInterfaces={effectiveQuery.storageInterfaces}
+        />
+      ) : (
+        <BrandNavStrip
+          categorySlug={category}
+          brands={brands}
+          builder={effectiveQuery.builder}
+          slot={effectiveQuery.slot}
+          sockets={effectiveQuery.sockets}
+          ramTypes={effectiveQuery.ramTypes}
+          formFactors={effectiveQuery.formFactors}
+          storageInterfaces={effectiveQuery.storageInterfaces}
+        />
+      )}
 
       {/* Main Catalog Layout */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">

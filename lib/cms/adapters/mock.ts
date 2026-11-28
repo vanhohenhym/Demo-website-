@@ -1,4 +1,5 @@
 import type { ICMSAdapter } from "../adapter.ts";
+import { buildMissingComponentSeedCategories } from "../component-categories.ts";
 import { loadBrandConfigs, loadSkuOverrides } from "../config-loader.ts";
 import { getCategoryBrands } from "../normalize/brands.ts";
 import {
@@ -21,7 +22,7 @@ import type {
   UnmappedAttributeSummary,
 } from "../types.ts";
 
-export const RAW_MOCK_CATEGORIES: RawCmsCategoryInput[] = [
+const BASE_MOCK_CATEGORIES: RawCmsCategoryInput[] = [
   {
     id: "cat-motherboard",
     name: "Motherboard",
@@ -106,6 +107,13 @@ export const RAW_MOCK_CATEGORIES: RawCmsCategoryInput[] = [
     description: "Routers, switches, and mesh Wi-Fi equipment.",
     icon: "Wifi",
   },
+];
+
+export const RAW_MOCK_CATEGORIES: RawCmsCategoryInput[] = [
+  ...BASE_MOCK_CATEGORIES,
+  ...buildMissingComponentSeedCategories(
+    new Set(BASE_MOCK_CATEGORIES.map((cat) => cat.slug.trim().toLowerCase()))
+  ),
 ];
 
 /**

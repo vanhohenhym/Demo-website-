@@ -1,4 +1,5 @@
 import { RAW_MOCK_CATEGORIES, RAW_MOCK_PRODUCTS } from "./adapters/mock.ts";
+import { buildMissingComponentSeedCategories } from "./component-categories.ts";
 import { normalizeAvailability, slugify } from "./field-map.ts";
 import type {
   Availability,
@@ -487,13 +488,22 @@ async function readOrSeedCatalog(
         Array.isArray(parsed.products)
       ) {
         const nowIso = new Date().toISOString();
+        const categories = parsed.categories.map(cloneCategoryRecord);
+        const existingSlugs = new Set(
+          categories.map((c) => c.slug.trim().toLowerCase())
+        );
+        const missingComponentCategories =
+          buildMissingComponentSeedCategories(existingSlugs);
         return {
           version: 1,
           seededAt:
             typeof parsed.seededAt === "string" ? parsed.seededAt : nowIso,
           updatedAt:
             typeof parsed.updatedAt === "string" ? parsed.updatedAt : nowIso,
-          categories: parsed.categories.map(cloneCategoryRecord),
+          categories:
+            missingComponentCategories.length > 0
+              ? [...categories, ...missingComponentCategories]
+              : categories,
           products: parsed.products.map(cloneProductRecord),
         };
       }

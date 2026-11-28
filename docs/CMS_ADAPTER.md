@@ -32,10 +32,10 @@ export interface ICMSAdapter {
 ---
 
 ## 3. Supported Adapters
-- **`mock` (`lib/cms/adapters/mock.ts`)**: Default demo adapter when `CMS_PROVIDER` is unset. Exports `RAW_MOCK_CATEGORIES` and `RAW_MOCK_PRODUCTS` supplying 32 intentionally messy raw CMS products across 12 categories (11 non-empty + 1 empty `networking` category) covering all 7 audited PC component types to exercise normalization, brand alias merging, SKU overrides, parsed fallbacks, unmapped attribute tracking, absent prices (`"Call for price"`), and sitemap exclusion.
+- **`mock` (`lib/cms/adapters/mock.ts`)**: Default demo adapter when `CMS_PROVIDER` is unset. Exports `RAW_MOCK_CATEGORIES` (combining base categories with all 16 Component sub-categories from `lib/cms/component-categories.ts`) and `RAW_MOCK_PRODUCTS` supplying intentionally messy raw CMS products across categories (including empty `networking`) covering all 7 audited PC component types to exercise normalization, brand alias merging, SKU overrides, parsed fallbacks, unmapped attribute tracking, absent prices (`"Call for price"`), and sitemap exclusion.
 - **`custom` (`lib/cms/adapters/custom.ts`, `lib/cms/custom-store.ts`)**: Built-in CMS adapter backed by a unified `CustomCmsStorageDriver`:
   - **Dual Runtime Persistence**: Automatically selects Cloudflare Workers `env.CMS_STORE` KV binding (via safe dynamic `import("cloudflare:workers")` specifier in `cloudflare.config.ts`) when deployed, or `.data/custom-cms.json` (with in-memory fallback) under Node.js local dev / `node --test`.
-  - **Auto-Seeding & Write Serialization**: First read on an empty store auto-seeds from `RAW_MOCK_CATEGORIES` and `RAW_MOCK_PRODUCTS` (all marked `status: "publish"`). Mutations use a serialized write lock and invalidate adapter caches automatically.
+  - **Auto-Seeding, Component Merge & Write Serialization**: First read on an empty store auto-seeds from `RAW_MOCK_CATEGORIES` and `RAW_MOCK_PRODUCTS` (all marked `status: "publish"`), and `readOrSeedCatalog()` merges any missing `COMPONENT_SUBCATEGORIES` into existing KV/JSON catalogs automatically. Mutations use a serialized write lock and invalidate adapter caches automatically.
   - **Draft Isolation & Preview**: Public `ICMSAdapter` methods (`getAllProducts`, `getProducts`, `getProductBySlug`, `getFeaturedProducts`, `getFlashDeals`, `getBrandsByCategory`, `getCategories`, `getUnmappedAttributes`) filter strictly to `status === "publish"`. Admin & preview methods (`getAllProductsAdmin()`, `getProductBySlugIncludingDrafts(slug)`, `getProductPreviewBySlug(slug)`, `clearCache()`, `dispose()`) power `/admin` and `/product/[slug]?preview=1`.
   - **Store Operations (`lib/cms/custom-store.ts`)**: Exports `listCustomProducts`, `getCustomProductById`, `getCustomProductBySlug`, `upsertCustomProduct`, `patchCustomProduct`, `deleteCustomProduct`, `duplicateCustomProduct`, `listCustomCategories`, `upsertCustomCategory`, `deleteCustomCategory`, `saveCustomMedia` (`url: "/api/cms/media/<id>"`), `getCustomMedia`, `listCustomMedia`, `deleteCustomMedia`, `resetCustomStoreToSeed`, `exportCustomStoreSnapshot`, and `importCustomStoreSnapshot`.
 - **`woocommerce` (`lib/cms/adapters/woocommerce.ts`)**: Integrates with WooCommerce REST API v3 using `CMS_ENDPOINT`, `CMS_KEY`, and `CMS_SECRET`, normalizing attributes, meta fields, HTML description specs, and taxonomies through the shared pipeline.
@@ -56,8 +56,9 @@ Every adapter produces `RawAdapterProduct` items and passes them through `normal
 4. **Shared Parent-Category Matching (`matchesCategorySlug` in `lib/cms/query-engine.ts`, re-exported from `lib/cms/index.ts`)**: Used uniformly by `queryProducts()`, `buildCategoriesWithCounts()`, and `getCategoryBrands()`. Matches when:
    - `categorySlug` is empty or `"all"`;
    - `categorySlug` directly equals `product.categorySlug`, `product.componentType`, or any slug in `product.subCategorySlugs` (case-insensitive);
-   - `categorySlug` is a top-level parent/group slug:
-     - `component` -> `componentType` in `cpu`, `motherboard`, `ram`, `gpu`, `storage`, `psu`, `case`, `cooler`;
+   - `categorySlug` is a top-level parent/group or split Component sub-category slug:
+     - `component` -> `componentType` in `cpu`, `motherboard`, `ram`, `gpu`, `storage`, `psu`, `case`, `cooler`, or `categorySlug`/`subCategorySlugs` in `COMPONENT_SUBCATEGORY_SLUGS`;
+     - split Component sub-categories (`processor`, `cpu-cooler`, `graphics-card`, `ram-desktop`, `ram-laptop`, `power-supply`, `hard-disk-drive`, `portable-hard-disk-drive`, `ssd`, `portable-ssd`, `casing`, `casing-cooler`, `optical-disk-drive`, `vertical-gpu-holder`, `water-liquid-cooling`) resolve cleanly across both direct CMS categories and normalized storage/RAM/cooler types;
      - `power` -> `componentType === "psu"` or `categorySlug === "power-supply"`;
      - `accessories` -> `componentType` in `keyboard`, `mouse`, `other`;
      - `gaming` -> `isFlashDeal === true` or `componentType` in `gpu`, `monitor`, `keyboard`, `mouse`;
@@ -84,12 +85,12 @@ Every adapter produces `RawAdapterProduct` items and passes them through `normal
 |---|---|---|
 | `cpu` | `cpu`, `cpus`, `processor`, `processors`, `desktop-processor`, `intel-processor`, `amd-processor` | `processor`, exact `cpu` |
 | `motherboard` | `motherboard`, `motherboards`, `mainboard`, `mainboards`, `mobo` | `motherboard`, `mainboard` |
-| `ram` | `ram`, `rams`, `memory`, `desktop-ram`, `ddr4-ram`, `ddr5-ram` | `ram`, `memory` |
+| `ram` | `ram`, `rams`, `memory`, `ram-desktop`, `desktop-ram`, `ram-laptop`, `laptop-ram`, `ddr4-ram`, `ddr5-ram` | `ram`, `memory` |
 | `gpu` | `gpu`, `gpus`, `graphics-card`, `graphics-cards`, `vga`, `video-card`, `video-cards` | `graphics-card`, `video-card`, `gpu` |
-| `storage` | `storage`, `ssd`, `ssds`, `hdd`, `hdds`, `nvme-ssd`, `m2-ssd`, `internal-storage`, `hard-drive`, `solid-state-drive` | `ssd`, `hdd`, `storage`, `nvme` |
+| `storage` | `storage`, `ssd`, `ssds`, `portable-ssd`, `hdd`, `hdds`, `hard-disk-drive`, `portable-hard-disk-drive`, `nvme-ssd`, `m2-ssd`, `internal-storage`, `hard-drive`, `solid-state-drive` | `ssd`, `hdd`, `storage`, `nvme` |
 | `psu` | `psu`, `psus`, `power-supply`, `power-supplies`, `smps` | `power-supply`, `psu` |
 | `case` | `case`, `cases`, `casing`, `pc-case`, `pc-cases`, `computer-case`, `chassis`, `cabinet` | `casing`, `pc-case`, `chassis` |
-| `cooler` | `cooler`, `coolers`, `cpu-cooler`, `cpu-coolers`, `air-cooler`, `liquid-cooler`, `aio-cooler`, `cooling` | `cooler`, `cooling` |
+| `cooler` | `cooler`, `coolers`, `cpu-cooler`, `cpu-coolers`, `casing-cooler`, `air-cooler`, `liquid-cooler`, `aio-cooler`, `water-liquid-cooling`, `cooling` | `cooler`, `cooling` |
 | `monitor` | `monitor`, `monitors`, `gaming-monitor`, `display` | `monitor` |
 | `keyboard` | `keyboard`, `keyboards`, `mechanical-keyboard` | `keyboard` |
 | `mouse` | `mouse`, `mice`, `gaming-mouse` | `mouse`, `mice` |

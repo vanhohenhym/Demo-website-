@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  COMPONENT_MENU_ITEMS,
+  COMPONENT_SUBCATEGORIES,
   MockCmsAdapter,
   buildCategoriesWithCounts,
   getCategoryBrands,
   matchesCategorySlug,
+  resolveComponentCategoryLabel,
 } from "../../lib/cms/index.ts";
 import { queryProducts } from "../../lib/cms/query-engine.ts";
 import type { Product } from "../../lib/cms/types.ts";
@@ -423,6 +426,81 @@ describe("Phase 4: Catalog Query Engine & URL Params", () => {
         }),
         "/category/cpu-cooler?socket=AM5&builder=1&slot=cooler&prefilter=1"
       );
+    });
+
+    it("exposes all 16 Component subcategories + Show All Component and splits storage/RAM/cooler queries accurately", async () => {
+      assert.deepStrictEqual(
+        COMPONENT_MENU_ITEMS.map((item) => item.name),
+        [
+          "Processor",
+          "CPU Cooler",
+          "Motherboard",
+          "Graphics Card",
+          "RAM (Desktop)",
+          "RAM (Laptop)",
+          "Power Supply",
+          "Hard Disk Drive",
+          "Portable Hard Disk Drive",
+          "SSD",
+          "Portable SSD",
+          "Casing",
+          "Casing Cooler",
+          "Optical Disk Drive",
+          "Vertical GPU Holder",
+          "Water / Liquid Cooling",
+          "Show All Component",
+        ]
+      );
+      assert.strictEqual(COMPONENT_SUBCATEGORIES.length, 16);
+      assert.strictEqual(resolveComponentCategoryLabel("ram-desktop"), "RAM (Desktop)");
+      assert.strictEqual(
+        resolveComponentCategoryLabel("water-liquid-cooling"),
+        "Water / Liquid Cooling"
+      );
+
+      const adapter = new MockCmsAdapter({ logUnmapped: false });
+      const all = await adapter.getAllProducts();
+
+      const ssdRes = queryProducts(all, { category: "ssd" });
+      assert.ok(ssdRes.total >= 2, "Expected internal SSDs to match /category/ssd");
+
+      const desktopRamRes = queryProducts(all, { category: "ram-desktop" });
+      assert.ok(desktopRamRes.total >= 1, "Expected desktop RAM to match /category/ram-desktop");
+
+      const laptopRamProduct: Product = {
+        id: "ram-sodimm-test",
+        sku: "TEST-SODIMM",
+        name: "Crucial 16GB DDR5-5600 SO-DIMM Laptop RAM",
+        slug: "crucial-16gb-laptop-ram",
+        categorySlug: "ram-laptop",
+        categoryName: "RAM (Laptop)",
+        componentType: "ram",
+        brand: "Crucial",
+        brandSlug: "crucial",
+        availability: "in_stock",
+        images: [],
+        attributes: {},
+      };
+      assert.strictEqual(matchesCategorySlug(laptopRamProduct, "ram-laptop"), true);
+      assert.strictEqual(matchesCategorySlug(laptopRamProduct, "ram-desktop"), false);
+      assert.strictEqual(matchesCategorySlug(laptopRamProduct, "component"), true);
+
+      const oddProduct: Product = {
+        id: "odd-test",
+        sku: "TEST-ODD",
+        name: "ASUS 24X Internal Optical Disk Drive",
+        slug: "asus-odd",
+        categorySlug: "optical-disk-drive",
+        categoryName: "Optical Disk Drive",
+        componentType: "other",
+        brand: "ASUS",
+        brandSlug: "asus",
+        availability: "in_stock",
+        images: [],
+        attributes: {},
+      };
+      assert.strictEqual(matchesCategorySlug(oddProduct, "optical-disk-drive"), true);
+      assert.strictEqual(matchesCategorySlug(oddProduct, "component"), true);
     });
   });
 });
