@@ -19,7 +19,13 @@ export default defineConfig({
     env: {
       ...cache.env,
       ASSETS: bindings.assets(),
-      CMS_PROVIDER: bindings.text("wp-posts"),
+      // Custom built-in CMS backed by Cloudflare KV (auto-provisioned via `cf deploy --provision`)
+      CMS_STORE: bindings.kv({ id: "fd8943544c89459abb4180af1d255659" }),
+      CMS_PROVIDER: bindings.text("custom"),
+      NEXT_PUBLIC_SITE_URL: bindings.text(
+        "https://demo-website.shahriarrahmannadim.workers.dev"
+      ),
+      // Fallback external CMS endpoint if switching CMS_PROVIDER back to wp-posts / woocommerce / generic-rest
       CMS_ENDPOINT: bindings.text(
         "https://public-api.wordpress.com/wp/v2/sites/shahriarnadimcom.wordpress.com"
       ),

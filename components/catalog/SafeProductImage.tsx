@@ -31,13 +31,19 @@ export function SafeProductImage({
     return <>{fallback}</>;
   }
 
+  const trimmedSrc = src.trim();
+  const isUnoptimized =
+    trimmedSrc.startsWith("/api/cms/media/") ||
+    trimmedSrc.startsWith("data:");
+
   return (
     <Image
-      src={src}
+      src={trimmedSrc}
       alt={alt}
       fill
       sizes={sizes}
       priority={priority}
+      unoptimized={isUnoptimized}
       className={className}
       onError={() => setFailedSrc(src)}
     />

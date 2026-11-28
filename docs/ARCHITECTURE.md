@@ -5,8 +5,13 @@
 ```
 .
 ├── AGENTS.md                  # Entry point and instructions for AI agents
+├── cloudflare.config.ts       # Cloudflare Workers / vinext bindings (CMS_STORE KV, CMS_PROVIDER)
+├── vite.config.ts             # Vite + @cloudflare/vite-plugin configuration for vinext
 ├── app/                       # Next.js App Router
+│   ├── admin/
+│   │   └── page.tsx           # Built-in WordPress-style Custom CMS Admin dashboard
 │   ├── api/
+│   │   ├── cms/               # Custom CMS REST endpoints (auth, products, categories, media, seed)
 │   │   └── contact/           # Contact form submission endpoint (rate limited, Zod)
 │   ├── category/
 │   │   └── [category]/
@@ -25,7 +30,7 @@
 │   │   └── page.tsx           # Privacy Policy page
 │   ├── product/
 │   │   └── [slug]/
-│   │       └── page.tsx       # Product detail page
+│   │       └── page.tsx       # Product detail page (supports ?preview=1 when admin-authenticated)
 │   ├── terms/
 │   │   └── page.tsx           # Terms & Conditions
 │   ├── layout.tsx             # Root layout (Header, Footer, Floating bar, Schema)
@@ -35,8 +40,9 @@
 │   ├── robots.ts              # Robots.txt generator
 │   └── sitemap.ts             # Dynamic sitemap generator
 ├── components/
+│   ├── admin/                 # Custom CMS Admin UI, ProductEditor, LiveProductPreview, MediaLibraryModal, CategoryManager
 │   ├── layout/                # Header, Nav, Footer, FloatingBar
-│   ├── catalog/               # ProductCard, Filters, Facets, Sort, Pagination
+│   ├── catalog/               # ProductCard, SafeProductImage, Filters, Facets, Sort, Pagination
 │   ├── compare/               # CompareBar, CompareTable
 │   ├── pc-builder/            # SlotRow, CompatibilitySummary, ShareModal
 │   ├── seo/                   # JsonLd, Breadcrumbs
@@ -48,12 +54,15 @@
 ├── docs/                      # Central memory system & Leapter business logic
 ├── lib/
 │   ├── cms/                   # CMS abstraction layer
-│   │   ├── adapters/          # mock.ts, woocommerce.ts, generic-rest.ts
-│   │   ├── normalize/         # attributes.ts, brands.ts
+│   │   ├── adapters/          # custom.ts, mock.ts, wp-posts.ts, woocommerce.ts, generic-rest.ts
+│   │   ├── normalize/         # attributes.ts, brands.ts, pipeline.ts
 │   │   ├── adapter.ts         # Interface ICMSAdapter
+│   │   ├── admin-auth.ts      # HMAC cookie + Bearer token auth for /admin & /api/cms/*
+│   │   ├── custom-store.ts    # Cloudflare KV (CMS_STORE) / Node (.data/custom-cms.json) store
 │   │   ├── field-map.ts       # Field mapping per provider
+│   │   ├── image-url.ts       # Safe renderable image URL validator
 │   │   ├── index.ts           # Adapter factory driven by CMS_PROVIDER
-│   │   └── types.ts           # Normalized domain types
+│   │   └── types.ts           # Normalized domain & custom CMS types
 │   ├── logic/                 # Pure TypeScript business logic (from docs/LOGIC)
 │   │   ├── vocab.ts           # Central sockets, storage, form factors vocab
 │   │   └── ...                # Ported logic functions matching test suites
@@ -64,7 +73,7 @@
 
 ## 2. Data Flow
 ```
-[External CMS / Mock Data]
+[Built-in Custom Store (KV / .data) or External CMS]
        │
        ▼
 [CMS Adapter: fetchProducts / fetchCategories]
@@ -80,16 +89,17 @@
        ▼
 [Normalized Product Domain Object]
        │
-       ├──► [Catalog / Brand Pages] (SSR with ISR revalidation)
-       ├──► [Product Detail Page] (SSR with ISR revalidation)
+       ├──► [Catalog / Brand Pages] (SSR `force-dynamic`)
+       ├──► [Product Detail Page] (SSR `force-dynamic`)
        ├──► [PC Builder Evaluator] (Client-side / SSR hybrid compatibility engine)
        └──► [Data Health Auditor] (Quality coverage scoring)
 ```
 
 ## 3. Rendering Strategy
-- **Homepage (`/`)**: ISR (`revalidate = 3600`) with dynamic banner elements.
-- **Category & Brand Pages (`/category/[category]`, `/category/[category]/[brand]`)**: SSR with URL search params (`price`, `brand`, `page`, etc.).
-- **Product Details (`/product/[slug]`)**: ISR (`revalidate = 3600`) with `generateStaticParams` for popular items and fallback to dynamic SSR for others.
+- **Homepage (`/`)**: Dynamic SSR (`force-dynamic`) so live CMS product creates, edits, and deletes reflect immediately across Next.js and Cloudflare Workers (`vinext`).
+- **Category & Brand Pages (`/category/[category]`, `/category/[category]/[brand]`)**: SSR (`force-dynamic`) with URL search params (`price`, `brand`, `page`, etc.).
+- **Product Details (`/product/[slug]`)**: Dynamic SSR (`force-dynamic`) with live CMS lookup and admin-authenticated `?preview=1` draft/live preview mode.
 - **PC Builder (`/pc-builder`)**: SSR shell with client-side interactive build state in `localStorage`.
 - **Compare (`/compare`)**: Client-side localStorage hydration over SSR table layout.
+- **CMS Admin (`/admin`)**: Client-hydrated dashboard (`noindex,nofollow`) backed by `/api/cms/*` REST endpoints and `pc_cms_admin` httpOnly cookie auth.
 - **Data Health (`/data-health`)**: Dynamic SSR guarded by `DATA_HEALTH_TOKEN` query/header check.

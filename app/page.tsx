@@ -11,7 +11,7 @@ import { EditorialSeoSection } from "@/components/home/EditorialSeoSection";
 
 const DEFAULT_MEGA_DEAL_END_ISO = "2026-12-15T23:59:59+06:00";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const megaDealTargetIso =

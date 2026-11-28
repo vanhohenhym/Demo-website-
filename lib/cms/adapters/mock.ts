@@ -21,7 +21,7 @@ import type {
   UnmappedAttributeSummary,
 } from "../types.ts";
 
-const RAW_MOCK_CATEGORIES: RawCmsCategoryInput[] = [
+export const RAW_MOCK_CATEGORIES: RawCmsCategoryInput[] = [
   {
     id: "cat-motherboard",
     name: "Motherboard",
@@ -120,7 +120,7 @@ const RAW_MOCK_CATEGORIES: RawCmsCategoryInput[] = [
  * - Products with absent price ("Call for price")
  * - Per-SKU overrides applied from data/overrides.json
  */
-const RAW_MOCK_PRODUCTS: RawAdapterProduct[] = [
+export const RAW_MOCK_PRODUCTS: RawAdapterProduct[] = [
   // ===================== MOTHERBOARDS (5) =====================
   {
     id: "mobo-1",

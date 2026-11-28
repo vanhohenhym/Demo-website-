@@ -4,6 +4,7 @@ export function isRenderableImageUrl(url?: string): url is string {
   return (
     trimmed.startsWith("https://") ||
     trimmed.startsWith("http://") ||
-    trimmed.startsWith("data:image/")
+    trimmed.startsWith("data:image/") ||
+    (trimmed.startsWith("/") && !trimmed.startsWith("//"))
   );
 }

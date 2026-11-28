@@ -287,6 +287,12 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-2 pt-5 text-[11px] text-gray-400 sm:flex-row">
           <p>&copy; 2026 Star Tech Ltd | All rights reserved</p>
           <div className="flex items-center gap-4">
+            <Link
+              href="/admin"
+              className="text-[11px] text-gray-300 underline-offset-2 transition-colors hover:text-brand-orange hover:underline"
+            >
+              CMS Admin
+            </Link>
             <CookieSettingsButton className="text-[11px] text-gray-300 underline-offset-2 transition-colors hover:text-brand-orange hover:underline" />
             <p>Powered By: Star Tech</p>
           </div>

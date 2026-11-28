@@ -10,7 +10,8 @@ A production-ready, CMS-agnostic computer and electronics e-commerce storefront 
 - **Language**: TypeScript 5 (`strict` mode)
 - **UI & Styling**: React 19, Tailwind CSS 3.4, `lucide-react`, `next/image` (`avif` / `webp`)
 - **Validation**: Zod (`^3.24.2`)
-- **Architecture**: CMS-agnostic `ICMSAdapter` (`mock`, `wp-posts`, `woocommerce`, `generic-rest`) + pure TypeScript domain logic (`lib/logic/`)
+- **Architecture**: CMS-agnostic `ICMSAdapter` (`mock`, `custom`, `wp-posts`, `woocommerce`, `generic-rest`) + pure TypeScript domain logic (`lib/logic/`)
+- **Runtime & Deployment**: Next.js / `vinext` (`@cloudflare/vite-plugin`) with Cloudflare KV (`CMS_STORE`) or Node.js `.data/custom-cms.json` storage
 - **Testing**: Node 24 native test runner (`node --test tests/**/*.test.ts`)
 
 ---
@@ -60,11 +61,12 @@ All variables are documented in [docs/ENV.md](docs/ENV.md) and templated in [.en
 | Variable Name | Required | Default Value | Purpose |
 |---|---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | No | `http://localhost:3000` | Canonical site base URL used for sitemaps, OpenGraph metadata, and canonical links. |
-| `CMS_PROVIDER` | No | `mock` | Selected CMS adapter: `mock`, `wp-posts` (`wordpress`), `woocommerce`, or `generic-rest`. |
+| `CMS_PROVIDER` | No | `mock` | Selected CMS adapter: `mock`, `custom`, `wp-posts` (`wordpress`), `woocommerce`, or `generic-rest`. |
 | `CMS_ENDPOINT` | If WP / WC / REST | `""` | Base API URL of external CMS (e.g. `https://public-api.wordpress.com/wp/v2/sites/your-site.wordpress.com` or `https://my-store.com/wp-json/wc/v3`). |
 | `CMS_KEY` | If WC (Optional WP/REST) | `""` | WooCommerce Consumer Key, `wp-posts` Username/Bearer Token, or `generic-rest` Bearer Token. |
 | `CMS_SECRET` | If WC (Optional WP) | `""` | WooCommerce Consumer Secret or WordPress Application Password. |
-| `DATA_HEALTH_TOKEN` | No | `demo-health-token-secret` | Secret authorization token required to access `/data-health`. |
+| `CMS_ADMIN_TOKEN` | Yes (in prod if `/admin` enabled) | Falls back to `DATA_HEALTH_TOKEN` (`demo-health-token-secret` non-prod) | Secret authorization token for `/admin` and `/api/cms/*` endpoints. |
+| `DATA_HEALTH_TOKEN` | No (Yes in prod) | `demo-health-token-secret` (non-prod) | Secret authorization token required to access `/data-health`. |
 | `NEXT_PUBLIC_GA_ID` | No | `""` | GA4 Measurement ID (`G-XXXXXXXXXX`). Loads only after explicit Cookie Consent opt-in (`pc_cookie_consent`). |
 | `NEXT_PUBLIC_GSC_VERIFICATION` | No | `""` | Google Search Console verification token injected into `metadata.verification.google`. |
 | `RESEND_API_KEY` | If Contact Resend | `""` | Resend API key (`https://api.resend.com/emails`). Highest contact transport priority when non-empty. |
@@ -84,10 +86,13 @@ The storefront is decoupled from any specific backend via `ICMSAdapter` (`lib/cm
 
 ### Option 1: Built-in Providers
 
-1. **Mock (`CMS_PROVIDER=mock`, default)**  
+1. **Built-in Custom CMS (`CMS_PROVIDER=custom`, configured in `.env.local` & `cloudflare.config.ts`)**  
+   Full WordPress-style admin dashboard at **`/admin`** (`CMS_ADMIN_TOKEN` protected) backed by `lib/cms/adapters/custom.ts` and `lib/cms/custom-store.ts`. Uses Cloudflare KV (`CMS_STORE` binding, auto-provisioned with `cf deploy --provision`) in Workers production and `.data/custom-cms.json` locally, auto-seeding the 32 demo products on first read. Includes draft/publish workflow, live storefront preview (`/product/<slug>?preview=1`), drag-and-drop image upload (`/api/cms/media/[id]`), structured hardware spec builder, category manager, and JSON backup/reset.
+
+2. **Mock (`CMS_PROVIDER=mock`, fallback default)**  
    Uses `lib/cms/adapters/mock.ts` with 32 intentionally messy raw products across 12 categories to test attribute normalization, brand merging, SKU overrides, `"Call for price"` fallback, and data health scoring.
 
-2. **WordPress Posts REST v2 (`CMS_PROVIDER=wp-posts`, zero plugins required)**  
+3. **WordPress Posts REST v2 (`CMS_PROVIDER=wp-posts`, zero plugins required)**  
    Works on free WordPress.com Simple sites as well as self-hosted WordPress (`/wp-json/wp/v2`). In `.env.local`:
    ```env
    CMS_PROVIDER=wp-posts
@@ -95,7 +100,7 @@ The storefront is decoupled from any specific backend via `ICMSAdapter` (`lib/cm
    ```
    `lib/cms/adapters/wp-posts.ts` turns WordPress Posts, Categories, Tags, Featured Media, and `Key: Value` spec lines/tables into normalized catalog products. See [docs/CMS_DATA_GUIDE.md](docs/CMS_DATA_GUIDE.md#5-free-wordpress-posts-mode-cms_providerwp-posts) for the post template.
 
-3. **WooCommerce (`CMS_PROVIDER=woocommerce`)**  
+4. **WooCommerce (`CMS_PROVIDER=woocommerce`)**  
    In `.env.local`:
    ```env
    CMS_PROVIDER=woocommerce
@@ -105,7 +110,7 @@ The storefront is decoupled from any specific backend via `ICMSAdapter` (`lib/cm
    ```
    `lib/cms/adapters/woocommerce.ts` reads WooCommerce REST v3 products, categories, attributes, `meta_data`, and HTML descriptions via `CMS_FIELD_MAPS["woocommerce"]` in `lib/cms/field-map.ts`.
 
-4. **Generic Headless REST (`CMS_PROVIDER=generic-rest`)**  
+5. **Generic Headless REST (`CMS_PROVIDER=generic-rest`)**  
    In `.env.local`:
    ```env
    CMS_PROVIDER=generic-rest
@@ -167,9 +172,10 @@ Full details and bulk import template: [docs/CMS_DATA_GUIDE.md](docs/CMS_DATA_GU
 
 ## Key Features, Routes & SEO Summary
 
-- **Homepage (`/`)**: ISR (`revalidate = 3600`) with 18-category navigation, Hero Carousel, 16-tile Featured Categories, 20+ Physical Stores banner, Flash Sale & Mega Deal CMS grids with countdown, Editorial SEO sections, and 3-zone Footer.
+- **Homepage (`/`)**: Dynamic SSR (`force-dynamic`) with 18-category navigation, Hero Carousel, 16-tile Featured Categories, 20+ Physical Stores banner, Flash Sale & Mega Deal CMS grids with countdown, Editorial SEO sections, and 3-zone Footer.
 - **Catalog & Brand Pages (`/category/[category]`, `/category/[category]/[brand]`)**: Dynamic SSR (`force-dynamic`) with URL-driven filters (`price`, `brand`, `availability`, `socket`, `ramType`, `formFactor`, `storageInterface`, `q`), zero-count facet suppression, sort, pagination, `BrandNavStrip`, and canonical/`noindex,follow` rules for filtered or thin pages.
-- **Product Detail Page (`/product/[slug]`)**: ISR (`revalidate = 3600`) with priority `next/image` hero, BDT pricing + `"Call for price"` fallback, provenanced specification table (`Explicit`, `Parsed`, `Override`, `CMS Raw`), `"Add to PC Builder"` link, and `Product` + `BreadcrumbList` JSON-LD.
+- **Product Detail Page (`/product/[slug]`)**: Dynamic SSR (`force-dynamic`) with priority `SafeProductImage` (`next/image`) hero, BDT pricing + `"Call for price"` fallback, provenanced specification table (`Explicit`, `Parsed`, `Override`, `CMS Raw`), `"Add to PC Builder"` link, admin-authenticated `?preview=1` draft preview banner, and `Product` + `BreadcrumbList` JSON-LD.
+- **Built-in CMS Admin (`/admin`, `/api/cms/*`)**: Token-protected (`CMS_ADMIN_TOKEN`) WordPress-style admin dashboard with draft/publish workflow, live storefront preview, media upload library (`/api/cms/media/[id]`), hardware spec builder, category manager, and JSON backup/reset.
 - **Product Compare (`/compare`)**: Compare up to **4 same-category products** with `localStorage` (`pc_compare_items`) persistence, cross-tab sync, category-mismatch confirmation modal, and difference highlighting (`"Show differences only"`).
 - **12-Slot PC Builder (`/pc-builder`)**: 12 slots (`cpu`, `cooler`, `motherboard`, `ram`, `storage`, `gpu`, `psu`, `case`, `monitor`, `keyboard`, `mouse`, `others`), Leapter compatibility rules (socket, RAM type, form factor, GPU clearance, PSU wattage + 100W buffer, cooler socket), `"Could not verify"` manual verification toggles, `?builder=1&slot=...` category flow, shareable `?share=` URLs, and `@media print` PDF summary.
 - **Contact Form (`/contact`, `POST /api/contact`)**: Client + server Zod validation, silent `honeypot` anti-spam rejection, per-IP rate limiting (`5` req / `10` min -> `429` + `Retry-After`), CRLF/HTML sanitization, and `Resend -> SMTP -> demo` transport precedence.

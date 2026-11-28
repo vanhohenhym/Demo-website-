@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2026-11-28] - Built-In Custom CMS, Admin Dashboard (`/admin`), Cloudflare KV Store & Live Preview
+### Added
+- `lib/cms/custom-store.ts` & `lib/cms/adapters/custom.ts`: Unified `CustomCmsStorageDriver` (`env.CMS_STORE` Cloudflare KV binding via dynamic `cloudflare:workers` import in production, `.data/custom-cms.json` + in-memory fallback locally) and `CustomCmsAdapter` (`providerName = "custom"`) with auto-seeding from mock data, serialized write lock, automatic cache invalidation, strict published-only storefront filtering, and draft/live preview methods (`getAllProductsAdmin`, `getProductBySlugIncludingDrafts`, `getProductPreviewBySlug`).
+- `lib/cms/admin-auth.ts`: HMAC-SHA256 httpOnly cookie (`pc_cms_admin`) + `Authorization: Bearer` / `?token=` authorization resolving `CMS_ADMIN_TOKEN || DATA_HEALTH_TOKEN` (explicit token required in `NODE_ENV === "production"`, `demo-health-token-secret` fallback in non-prod).
+- `app/api/cms/*`: Added REST API routes `auth/route.ts`, `products/route.ts`, `products/[id]/route.ts`, `categories/route.ts`, `media/route.ts`, `media/[id]/route.ts` (public cached binary `GET` + auth-guarded `DELETE`), `seed/route.ts` (JSON backup export, import, and demo seed reset), and `_revalidate.ts` (`revalidateCmsStorefront()` calling `revalidatePath` on mutations).
+- `app/admin/page.tsx` & `components/admin/*`: Added WordPress-style Custom CMS Admin & Live Preview Dashboard (`AdminLoginCard.tsx`, `AdminCmsApp.tsx`, `ProductEditor.tsx`, `LiveProductPreview.tsx`, `MediaLibraryModal.tsx`, `CategoryManager.tsx`, `types.ts`) with `noindex,nofollow` metadata, drag-and-drop media upload, structured hardware spec presets, and keystroke-live Catalog Card / PDP preview.
+- `tests/cms/custom-cms.test.ts` & `tests/cms/custom-api.test.ts`: Added unit tests covering KV/file storage, draft isolation, CRUD, media upload/fetch, auth guards, and snapshot reset/import.
+### Changed
+- `cloudflare.config.ts`: Added `CMS_STORE: bindings.kv()`, switched `CMS_PROVIDER` to `bindings.text("custom")`, and retained `CMS_ENDPOINT` fallback, `accountId`, and `compatibilityFlags: ["nodejs_compat"]`.
+- `.env.example`, `.env.local`, `.gitignore`: Added `custom` provider option and `CMS_ADMIN_TOKEN`, configured `.env.local` for `CMS_PROVIDER=custom`, and ignored `.data/`.
+- `app/robots.ts` & `components/layout/Footer.tsx`: Disallowed `/admin` and `/admin/*` in `robots.txt` and added a subtle `"CMS Admin"` link (`/admin`) in the footer utility row.
+- `lib/cms/adapters/mock.ts`, `lib/cms/types.ts`, `lib/cms/index.ts`, `lib/cms/image-url.ts`, `components/catalog/SafeProductImage.tsx`, `app/page.tsx`, `app/product/[slug]/page.tsx`: Exported mock seed arrays, registered `"custom"` provider, enabled safe relative `/api/cms/media/<id>` image URLs (`unoptimized` in `SafeProductImage`), switched `app/page.tsx` to `force-dynamic` with `revalidatePath` calls on CMS API mutations (`products`, `products/[id]`, `categories`, `seed`), and added authenticated `?preview=1` draft/live PDP banner (`noindex,nofollow`).
+- Updated `docs/ROUTES.md`, `docs/CMS_ADAPTER.md`, `docs/CMS_DATA_GUIDE.md`, `docs/COMPONENTS.md`, `docs/ENV.md`, `docs/ARCHITECTURE.md`, `README.md`, `docs/CHANGELOG.md`, and `docs/INDEX.md`.
+
 ## [2026-11-25] - Cloudflare Workers Migration (`vinext` + Typed `cf` Config)
 ### Added
 - `vite.config.ts` & `cloudflare.config.ts`: Configured `vinext` with `workersCacheCdnAdapter()`, `@cloudflare/vite-plugin`, `nodejs_compat`, `demo-website` Worker name, `accountId`, and `CMS_PROVIDER` / `CMS_ENDPOINT` text bindings for WordPress REST v2 (`wp-posts`).

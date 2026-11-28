@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckCircle2, Cpu, ShieldCheck, Tag } from "lucide-react";
-import { getCmsAdapter } from "@/lib/cms";
+import { CustomCmsAdapter, getCmsAdapter } from "@/lib/cms";
+import { isAdminAuthenticated } from "@/lib/cms/admin-auth";
 import type {
   Availability,
+  CmsProductStatus,
   ComponentType,
   NormalizedAttribute,
   Product,
@@ -19,10 +21,53 @@ import { SafeProductImage } from "@/components/catalog/SafeProductImage";
 import { isRenderableImageUrl } from "@/lib/cms/image-url";
 import { CompareButton } from "@/components/compare/CompareButton";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+async function resolveProductForPage(
+  slug: string,
+  previewParam: string | string[] | undefined
+): Promise<{
+  product: Product | null;
+  isPreviewActive: boolean;
+  previewStatus: CmsProductStatus | null;
+}> {
+  const adapter = getCmsAdapter();
+  const wantsPreview =
+    previewParam === "1" ||
+    (Array.isArray(previewParam) && previewParam[0] === "1");
+
+  if (wantsPreview && (await isAdminAuthenticated())) {
+    if (adapter instanceof CustomCmsAdapter) {
+      const preview = await adapter.getProductPreviewBySlug(slug);
+      if (!preview) {
+        return { product: null, isPreviewActive: true, previewStatus: null };
+      }
+      return {
+        product: preview.product,
+        isPreviewActive: true,
+        previewStatus: preview.status,
+      };
+    }
+
+    const fallbackProduct = await adapter.getProductBySlug(slug);
+    return {
+      product: fallbackProduct,
+      isPreviewActive: true,
+      previewStatus: fallbackProduct ? "publish" : null,
+    };
+  }
+
+  const product = await adapter.getProductBySlug(slug);
+  return {
+    product,
+    isPreviewActive: false,
+    previewStatus: null,
+  };
 }
 
 function formatBdt(amount: number): string {
@@ -219,9 +264,14 @@ function ProductImageFallback({
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getCmsAdapter().getProductBySlug(slug);
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const { product, isPreviewActive } = await resolveProductForPage(
+    slug,
+    resolvedSearchParams.preview
+  );
 
   if (!product) {
     return constructMetadata({
@@ -245,13 +295,20 @@ export async function generateMetadata({
     path: `/product/${product.slug}`,
     canonicalPath: `/product/${product.slug}`,
     image: ogImage,
+    noIndex: isPreviewActive,
+    noFollow: isPreviewActive,
   });
 }
 
-export default async function ProductDetailPage({ params }: ProductPageProps) {
+export default async function ProductDetailPage({
+  params,
+  searchParams,
+}: ProductPageProps) {
   const { slug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const adapter = getCmsAdapter();
-  const product = await adapter.getProductBySlug(slug);
+  const { product, isPreviewActive, previewStatus } =
+    await resolveProductForPage(slug, resolvedSearchParams.preview);
 
   if (!product) {
     notFound();
@@ -285,6 +342,30 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <div className="space-y-6">
+      {isPreviewActive && previewStatus ? (
+        <div
+          role="status"
+          className="sticky top-2 z-40 flex flex-wrap items-center justify-between gap-3 rounded-card border border-amber-300 bg-amber-50/95 px-4 py-2.5 text-xs font-medium text-amber-950 shadow-sm backdrop-blur"
+        >
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-full bg-amber-600 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
+              PREVIEW MODE ({previewStatus === "draft" ? "Draft" : "Live"})
+            </span>
+            <span>
+              Authenticated CMS preview{" "}
+              {previewStatus === "draft"
+                ? "— this draft is hidden from public catalog pages."
+                : "— this product is live on the storefront."}
+            </span>
+          </div>
+          <Link
+            href="/admin"
+            className="inline-flex items-center rounded-control bg-amber-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-amber-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+          >
+            Back to /admin
+          </Link>
+        </div>
+      ) : null}
       <JsonLd schema={getProductSchema(product)} />
       <Breadcrumbs
         items={[

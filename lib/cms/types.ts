@@ -180,7 +180,123 @@ export interface CatalogQueryResult {
   facets: FacetGroup[];
 }
 
-export type CmsProviderName = "mock" | "woocommerce" | "generic-rest" | "wp-posts";
+export type CmsProviderName =
+  | "mock"
+  | "woocommerce"
+  | "generic-rest"
+  | "wp-posts"
+  | "custom";
+
+export type CmsProductStatus = "publish" | "draft";
+
+export interface CustomCmsProductRecord {
+  id: string;
+  sku: string;
+  title: string;
+  slug: string;
+  status: CmsProductStatus;
+  categorySlug: string;
+  categoryName: string;
+  subCategorySlugs?: string[];
+  explicitComponentType?: string;
+  brandTaxonomy?: string;
+  price?: number;
+  salePrice?: number;
+  availability: Availability;
+  stockQuantity?: number;
+  images: ProductImage[];
+  shortDescription?: string;
+  descriptionHtml?: string;
+  explicitAttributes: KeyValuePair[];
+  customFields?: KeyValuePair[];
+  descriptionSpecs?: KeyValuePair[];
+  warranty?: string;
+  isFeatured?: boolean;
+  isFlashDeal?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CustomCmsProductInput {
+  id?: string;
+  sku?: string;
+  title?: string;
+  slug?: string | null;
+  status?: CmsProductStatus;
+  categorySlug?: string;
+  categoryName?: string;
+  subCategorySlugs?: string[] | null;
+  explicitComponentType?: string | null;
+  brandTaxonomy?: string | null;
+  price?: number | null;
+  salePrice?: number | null;
+  availability?: Availability;
+  stockQuantity?: number | null;
+  images?: ProductImage[];
+  shortDescription?: string | null;
+  descriptionHtml?: string | null;
+  explicitAttributes?: KeyValuePair[];
+  customFields?: KeyValuePair[];
+  descriptionSpecs?: KeyValuePair[];
+  warranty?: string | null;
+  isFeatured?: boolean;
+  isFlashDeal?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CustomCmsCategoryInput {
+  id?: string;
+  name: string;
+  slug?: string;
+  description?: string | null;
+  icon?: string | null;
+  image?: string | null;
+  parentSlug?: string | null;
+}
+
+export interface CustomCmsMediaMetadata {
+  id: string;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  url: string;
+  createdAt: string;
+}
+
+export interface CustomCmsMediaRecord extends CustomCmsMediaMetadata {
+  bytesBase64: string;
+}
+
+export interface CustomCmsMediaInput {
+  id?: string;
+  filename: string;
+  mimeType: string;
+  bytesBase64: string;
+  sizeBytes?: number;
+}
+
+export interface CustomCmsSnapshot {
+  version: 1;
+  seededAt: string;
+  updatedAt: string;
+  categories: RawCmsCategoryInput[];
+  products: CustomCmsProductRecord[];
+  media: CustomCmsMediaRecord[];
+}
+
+export interface KvNamespaceLike {
+  get(key: string, type?: "text"): Promise<string | null>;
+  put(key: string, value: string): Promise<void>;
+  delete(key: string): Promise<void>;
+}
+
+export interface CustomCmsStorageDriver {
+  readonly kind: "cloudflare-kv" | "node-fs" | "memory";
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string): Promise<void>;
+  delete(key: string): Promise<void>;
+}
 
 export interface RawCmsCategoryInput {
   id: string;

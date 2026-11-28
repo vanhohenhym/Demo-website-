@@ -84,3 +84,18 @@ If your WordPress site does not have WooCommerce installed (for example, a free 
    TDP: 120W
    ```
 5. **Tags / Sticky**: Mark a post as **Sticky** (or add tag `featured`) to show it in Featured sections, and add tag `flash-deal` (or set `Sale Price` lower than `Price`) to include it in Flash Sale & Mega Deal sections.
+
+---
+
+## 6. Built-In Custom CMS Admin (`CMS_PROVIDER=custom`)
+
+When `CMS_PROVIDER=custom` is active (configured in `.env.local` for local dev and `cloudflare.config.ts` via Cloudflare KV `CMS_STORE` for Workers deploys), manage your catalog directly from the built-in WordPress-style dashboard at **`/admin`** (linked as `"CMS Admin"` in the footer):
+
+1. **Sign In**: Enter `CMS_ADMIN_TOKEN` (falls back to `DATA_HEALTH_TOKEN`, or `demo-health-token-secret` in non-production local dev).
+2. **Products & Drafts**:
+   - Click **"+ Add Product"** (or **Edit** / **Quick Edit** / **Duplicate** on any row) to manage Title, auto-generated Slug, Short Description, HTML Description, SKU, Regular Price, Sale Price, Availability (`in_stock` / `out_of_stock` / `pre_order`), Stock Quantity, Warranty, and Featured / Flash Deal flags.
+   - New products and duplicates default to **Draft** (`status: "draft"`) and remain hidden from the live storefront, category pages, and sitemaps until published (`status: "publish"`).
+   - Use the split **Live Preview** panel (`Catalog Card View` / `Product Detail Page View`) to inspect storefront rendering on every keystroke, or click **"Open Full Page Preview"** (`/product/<slug>?preview=1`) after saving.
+3. **Media Gallery**: Upload PNG, JPEG, WebP, AVIF, or GIF images up to **2 MB** via drag-and-drop or the Media Library (`POST /api/cms/media`, served publicly at `/api/cms/media/<id>`), or paste external `https://` image URLs.
+4. **Hardware Spec Builder**: Add structured key/value attributes using quick-add presets (`Socket`, `RAM Type`, `Form Factor`, `TDP`, `Wattage`, `Length (mm)`, `Max GPU Length (mm)`, `Cooler Sockets`, `Storage Interface`) matching Section 1 & Section 2 vocabularies.
+5. **Categories & Backups**: Manage categories (`name`, `slug`, `parentSlug`, `description`) in **Categories**, and export/import full JSON catalog snapshots or reset to the 32-product demo seed in **Tools / Backup**.

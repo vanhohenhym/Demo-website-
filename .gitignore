@@ -20,6 +20,9 @@ next-env.d.ts
 # Generated audit reports
 reports/
 
+# Local custom CMS store & uploaded media
+.data/
+
 # Logs & OS files
 *.log
 *.zip

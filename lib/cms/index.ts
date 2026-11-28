@@ -1,4 +1,5 @@
 import type { ICMSAdapter } from "./adapter.ts";
+import { CustomCmsAdapter } from "./adapters/custom.ts";
 import { GenericRestCmsAdapter } from "./adapters/generic-rest.ts";
 import { MockCmsAdapter } from "./adapters/mock.ts";
 import { WooCommerceCmsAdapter } from "./adapters/woocommerce.ts";
@@ -48,8 +49,46 @@ export {
   queryProducts,
   summarizeUnmappedAttributes,
 } from "./query-engine.ts";
+export {
+  CustomCmsAdapter,
+  type CustomCmsAdapterOptions,
+  type CustomCmsPreviewProduct,
+} from "./adapters/custom.ts";
+export {
+  createKvStorageDriver,
+  createMemoryStorageDriver,
+  createNodeFsStorageDriver,
+  customRecordToRawAdapterProduct,
+  deleteCustomCategory,
+  deleteCustomMedia,
+  deleteCustomProduct,
+  duplicateCustomProduct,
+  exportCustomStoreSnapshot,
+  getActiveStorageDriver,
+  getCustomCatalogVersion,
+  getCustomMedia,
+  getCustomProductById,
+  getCustomProductBySlug,
+  getCustomStoreMutationEpoch,
+  importCustomStoreSnapshot,
+  listCustomCategories,
+  listCustomMedia,
+  listCustomProducts,
+  onCustomStoreMutation,
+  patchCustomProduct,
+  resetCustomStoreDriver,
+  resetCustomStoreToSeed,
+  saveCustomMedia,
+  setCustomStoreDriver,
+  upsertCustomCategory,
+  upsertCustomProduct,
+} from "./custom-store.ts";
 export { GenericRestCmsAdapter, mapGenericRestProductToRaw } from "./adapters/generic-rest.ts";
-export { MockCmsAdapter } from "./adapters/mock.ts";
+export {
+  MockCmsAdapter,
+  RAW_MOCK_CATEGORIES,
+  RAW_MOCK_PRODUCTS,
+} from "./adapters/mock.ts";
 export { WooCommerceCmsAdapter, mapWooProductToRaw } from "./adapters/woocommerce.ts";
 export { WpPostsCmsAdapter, mapWpPostToRaw } from "./adapters/wp-posts.ts";
 export { toCatalogProduct } from "./types.ts";
@@ -62,14 +101,24 @@ export type {
   CatalogQueryParams,
   CatalogQueryResult,
   Category,
+  CmsProductStatus,
   CmsProviderName,
   CompatibilityStatus,
   ComponentType,
+  CustomCmsCategoryInput,
+  CustomCmsMediaInput,
+  CustomCmsMediaMetadata,
+  CustomCmsMediaRecord,
+  CustomCmsProductInput,
+  CustomCmsProductRecord,
+  CustomCmsSnapshot,
+  CustomCmsStorageDriver,
   FacetGroup,
   FacetValue,
   FormFactor,
   HealthStatus,
   KeyValuePair,
+  KvNamespaceLike,
   LogicCatalogProduct,
   NormalizedAttribute,
   Product,
@@ -88,6 +137,9 @@ export function resolveCmsProviderName(raw?: string): CmsProviderName {
     .trim()
     .toLowerCase();
 
+  if (normalized === "custom" || normalized === "custom-cms") {
+    return "custom";
+  }
   if (normalized === "woocommerce" || normalized === "woo") {
     return "woocommerce";
   }
@@ -113,6 +165,8 @@ export function createCmsAdapter(provider?: string): ICMSAdapter {
   const resolved = resolveCmsProviderName(provider);
 
   switch (resolved) {
+    case "custom":
+      return new CustomCmsAdapter();
     case "woocommerce":
       return new WooCommerceCmsAdapter();
     case "generic-rest":

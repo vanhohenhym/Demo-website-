@@ -3,11 +3,11 @@
 ## 1. Overview
 The site is 100% CMS-agnostic. Products, categories, brands, and inventory are fetched from an external CMS via a single adapter contract (`ICMSAdapter`).
 To switch or connect a CMS:
-1. Configure environment variables in `.env.local` (`CMS_PROVIDER=wp-posts`, `woocommerce`, or `generic-rest`, plus `CMS_ENDPOINT` and optional `CMS_KEY`/`CMS_SECRET`).
+1. Configure environment variables in `.env.local` (`CMS_PROVIDER=custom`, `mock`, `wp-posts`, `woocommerce`, or `generic-rest`, plus `CMS_ADMIN_TOKEN` for `custom` or `CMS_ENDPOINT` and optional `CMS_KEY`/`CMS_SECRET` for external providers).
 2. Verify or extend the provider field map and `COMPONENT_TYPE_SLUG_MAP` in `lib/cms/field-map.ts`.
 3. Zero React components or page routes need modification.
 
-Adapter selection is handled by `getCmsAdapter()` / `createCmsAdapter()` in `lib/cms/index.ts`, which resolves `CMS_PROVIDER` (defaulting to `"mock"`).
+Adapter selection is handled by `getCmsAdapter()` / `createCmsAdapter()` in `lib/cms/index.ts`, which resolves `CMS_PROVIDER` (defaulting to `"mock"` when unset).
 
 ---
 
@@ -32,7 +32,12 @@ export interface ICMSAdapter {
 ---
 
 ## 3. Supported Adapters
-- **`mock` (`lib/cms/adapters/mock.ts`)**: Default demo adapter. Supplies 32 intentionally messy raw CMS products across 12 categories (11 non-empty + 1 empty `networking` category) covering all 7 audited PC component types to exercise normalization, brand alias merging, SKU overrides, parsed fallbacks, unmapped attribute tracking, absent prices (`"Call for price"`), and sitemap exclusion.
+- **`mock` (`lib/cms/adapters/mock.ts`)**: Default demo adapter when `CMS_PROVIDER` is unset. Exports `RAW_MOCK_CATEGORIES` and `RAW_MOCK_PRODUCTS` supplying 32 intentionally messy raw CMS products across 12 categories (11 non-empty + 1 empty `networking` category) covering all 7 audited PC component types to exercise normalization, brand alias merging, SKU overrides, parsed fallbacks, unmapped attribute tracking, absent prices (`"Call for price"`), and sitemap exclusion.
+- **`custom` (`lib/cms/adapters/custom.ts`, `lib/cms/custom-store.ts`)**: Built-in CMS adapter backed by a unified `CustomCmsStorageDriver`:
+  - **Dual Runtime Persistence**: Automatically selects Cloudflare Workers `env.CMS_STORE` KV binding (via safe dynamic `import("cloudflare:workers")` specifier in `cloudflare.config.ts`) when deployed, or `.data/custom-cms.json` (with in-memory fallback) under Node.js local dev / `node --test`.
+  - **Auto-Seeding & Write Serialization**: First read on an empty store auto-seeds from `RAW_MOCK_CATEGORIES` and `RAW_MOCK_PRODUCTS` (all marked `status: "publish"`). Mutations use a serialized write lock and invalidate adapter caches automatically.
+  - **Draft Isolation & Preview**: Public `ICMSAdapter` methods (`getAllProducts`, `getProducts`, `getProductBySlug`, `getFeaturedProducts`, `getFlashDeals`, `getBrandsByCategory`, `getCategories`, `getUnmappedAttributes`) filter strictly to `status === "publish"`. Admin & preview methods (`getAllProductsAdmin()`, `getProductBySlugIncludingDrafts(slug)`, `getProductPreviewBySlug(slug)`, `clearCache()`, `dispose()`) power `/admin` and `/product/[slug]?preview=1`.
+  - **Store Operations (`lib/cms/custom-store.ts`)**: Exports `listCustomProducts`, `getCustomProductById`, `getCustomProductBySlug`, `upsertCustomProduct`, `patchCustomProduct`, `deleteCustomProduct`, `duplicateCustomProduct`, `listCustomCategories`, `upsertCustomCategory`, `deleteCustomCategory`, `saveCustomMedia` (`url: "/api/cms/media/<id>"`), `getCustomMedia`, `listCustomMedia`, `deleteCustomMedia`, `resetCustomStoreToSeed`, `exportCustomStoreSnapshot`, and `importCustomStoreSnapshot`.
 - **`woocommerce` (`lib/cms/adapters/woocommerce.ts`)**: Integrates with WooCommerce REST API v3 using `CMS_ENDPOINT`, `CMS_KEY`, and `CMS_SECRET`, normalizing attributes, meta fields, HTML description specs, and taxonomies through the shared pipeline.
   - **Leaf-Category Selection (`mapWooProductToRaw`)**: Selects the deepest/last category in `woo.categories` whose normalized slug exists in `COMPONENT_TYPE_SLUG_MAP` (falling back to the last/first entry) for `categorySlug` and `categoryName`, while preserving all raw slugs in `subCategorySlugs`.
   - **Caching, Deduplication & Timeouts**: `WooCommerceCmsAdapter` supports `cacheTtlMs` (default `60_000` ms / 60s) and `timeoutMs` (default `10_000` ms / 10s via `AbortSignal.timeout()`). `getAllProducts()` caches normalized results in memory with TTL expiry, deduplicates concurrent in-flight fetches, and exposes `clearCache()` (with epoch guard so stale in-flight requests do not repopulate cleared cache). `getProductBySlug()` checks cached `getAllProducts()` first (resolving synthesized `${title}-${sku}` slugs without extra HTTP requests) and falls back to `?slug=...&status=publish`.
